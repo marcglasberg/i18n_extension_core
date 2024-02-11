@@ -239,7 +239,7 @@ String localizePlural(
 }
 
 /// See rules stated in [localizePlural]'s documentation.
-/// TODO: @visibleForTesting
+/// IMPORTANT: This function is visible for testing only.
 int convertToIntegerModifier(Object? modifierObj) {
   //
   if (modifierObj is! int && modifierObj is! double) {
