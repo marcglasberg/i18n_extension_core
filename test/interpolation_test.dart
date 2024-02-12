@@ -1,8 +1,8 @@
-import 'package:i18n_extension_core/i18n_extension_core.dart';
+import 'package:i18n_extension_core/src/core_localize_functions.dart';
+import 'package:i18n_extension_core/src/translations.dart';
 import 'package:test/test.dart';
 
 void main() {
-  //
   test("String interpolations.", () {
     //
     DefaultLocale.set("en_US");

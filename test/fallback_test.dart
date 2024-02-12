@@ -1,8 +1,8 @@
-import 'package:i18n_extension_core/i18n_extension_core.dart';
+import 'package:i18n_extension_core/src/core_localize_functions.dart';
+import 'package:i18n_extension_core/src/translations.dart';
 import 'package:test/test.dart';
 
 void main() {
-  //
   test(
       "If the translation to the exact locale is found, this will be returned. "
       "Otherwise, it tries to return a translation for the general language of the locale. "

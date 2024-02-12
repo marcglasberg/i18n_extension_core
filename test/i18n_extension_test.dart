@@ -342,7 +342,7 @@ void main() {
   test("Combine 2 translations by locale.", () {
     DefaultLocale.set("en_US");
 
-    TranslationsByLocale t1 = Translations.byLocale("en_us") +
+    var t1 = Translations.byLocale("en_us") +
         {
           "en_us": {
             "Hi.": "Hi.",
@@ -354,7 +354,7 @@ void main() {
           }
         };
 
-    TranslationsByLocale t2 = Translations.byLocale("en_us") +
+    var t2 = Translations.byLocale("en_us") +
         {
           "pt_br": {
             "Hi.": "Olá.",
@@ -393,7 +393,7 @@ void main() {
   });
 
   test("Keys can vary from the translations. Should return the value or key.", () {
-    TranslationsByLocale t = Translations.byLocale("en_us") +
+    var t = Translations.byLocale("en_us") +
         {
           "en_us": {
             "Hi.": "Hello.", // Different key/value for default language
@@ -454,7 +454,7 @@ void main() {
           "pt_br": "Olá.",
         };
 
-    TranslationsByLocale t2 = Translations.byLocale("en_us") +
+    var t2 = Translations.byLocale("en_us") +
         {
           "pt_br": {
             "Hi.": "Olá.",
@@ -737,7 +737,7 @@ void main() {
   test("Czech variations.", () {
     DefaultLocale.set("en_US");
 
-    Translations t = Translations("en_us") +
+    var t = Translations("en_us") +
         {
           "en_us": "1 beer"
               .zero("0 beers")
@@ -859,7 +859,7 @@ void main() {
 
     // ---
 
-    Translations t = Translations("en_us") +
+    var t = Translations("en_us") +
         {
           "en_us": "1 beer"
               .zeroOne("0 or 1 beers")
@@ -909,7 +909,7 @@ void main() {
 
     // ---
 
-    Translations t = Translations("en_us") +
+    var t = Translations("en_us") +
         {
           "en_us": "1 beer"
               .oneOrMore("1 or more beers")
@@ -994,7 +994,7 @@ void main() {
 
     // ---
 
-    Translations t = Translations("en_us") +
+    var t = Translations("en_us") +
         {
           "en_us": "unversioned".zero("version 0").many("version many"),
           "pt_br": "não versionada".zero("versão 0").many("versão várias"),

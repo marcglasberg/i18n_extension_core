@@ -22,7 +22,7 @@ void main() {
     Translations.missingTranslations.clear();
 
     // Call recordKey() directly.
-    recordKey("Goodbye");
+    recordMissingKey("Goodbye");
 
     expect(Translations.missingKeys.length, 1);
     expect(Translations.missingKeys.single.locale, "");

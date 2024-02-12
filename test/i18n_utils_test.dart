@@ -1,8 +1,7 @@
-import 'package:i18n_extension_core/i18n_extension_core.dart';
+import 'package:i18n_extension_core/src/core_localize_functions.dart';
 import 'package:test/test.dart';
 
 void main() {
-  //
   test("Get the normalize Locale.", () {
     expect(DefaultLocale.normalizeLocale("EN_US"), "en_us");
     expect(DefaultLocale.normalizeLocale("en_US"), "en_us");

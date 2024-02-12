@@ -35,6 +35,13 @@ the [i18n_extension](https://pub.dev/packages/i18n_extension) package._
 
 Go to [i18n_extension](https://pub.dev/packages/i18n_extension) to read the docs.
 
+There are only 2 differences when using this package directly:
+
+* Here you don't have access to the `I18n` widget, which is a Flutter widget.
+
+* The way to set the default locale is different. Instead of using the `I18n` widget, you must use
+  the `DefaultLocale.set()` static method, like in the example above.
+
 ********
 
 ## Marcelo Glasberg

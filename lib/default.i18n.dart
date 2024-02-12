@@ -1,6 +1,7 @@
 // Developed by Marcelo Glasberg (2019) https://glasberg.dev and https://github.com/marcglasberg
 // For more info, see: https://pub.dartlang.org/packages/i18n_extension
-import 'i18n_extension_core.dart';
+
+import 'package:i18n_extension_core/src/core_localize_functions.dart';
 
 /// When you create a widget that has translatable strings,
 /// add this default import to the widget's file:
@@ -14,10 +15,10 @@ import 'i18n_extension_core.dart';
 ///
 extension Localization on String {
   //
-  String get i18n => recordKey(this);
+  String get i18n => recordMissingKey(this);
 
   String plural(value) {
-    recordKey(this);
+    recordMissingKey(this);
     return replaceAll("%d", value.toString());
   }
 
