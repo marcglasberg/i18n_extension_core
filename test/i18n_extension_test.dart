@@ -340,6 +340,59 @@ void main() {
         '-----------------------------\n');
   });
 
+  test("Combine 2 translations, one of them by locale. Define both as `Translations`", () {
+    DefaultLocale.set("en_US");
+
+    Translations t1 = Translations.byText("en_us") +
+        {
+          "cs_cz": "Ahoj.",
+          "en_us": "Hi.",
+          "pt_br": "Olá.",
+        };
+
+    Translations t2 = Translations.byLocale("en_us") +
+        {
+          "pt_br": {
+            "Hi.": "Olá.",
+            "Goodbye.": "Adeus.",
+          }
+        };
+
+    // ---
+
+    var t12 = t1 * t2;
+
+    expect(t12.length, 2);
+
+    expect(t12.translationByLocale_ByTranslationKey, {
+      'Hi.': {
+        'cs_cz': 'Ahoj.',
+        'en_us': 'Hi.',
+        'pt_br': 'Olá.',
+      },
+      'Goodbye.': {
+        'pt_br': 'Adeus.',
+      }
+    });
+
+    // ---
+
+    var t21 = t2 * t1;
+
+    expect(t21.length, 2);
+
+    expect(t21.translationByLocale_ByTranslationKey, {
+      'Hi.': {
+        'cs_cz': 'Ahoj.',
+        'en_us': 'Hi.',
+        'pt_br': 'Olá.',
+      },
+      'Goodbye.': {
+        'pt_br': 'Adeus.',
+      }
+    });
+  });
+
   test("Combine 2 translations by locale.", () {
     DefaultLocale.set("en_US");
 
@@ -445,7 +498,7 @@ void main() {
     expect(localize('Hi.', t), "Hello.");
   });
 
-  test("Combine 2 translations, one of them by locale.", () {
+  test("Combine 2 translations, one of them by locale. Define both as `var`", () {
     DefaultLocale.set("en_US");
 
     var t1 = Translations.byText("en_us") +
