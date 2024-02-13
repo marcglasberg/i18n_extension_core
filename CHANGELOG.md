@@ -1,4 +1,4 @@
-## 2.0.1
+## 2.0.0
 
 * Translations:
     - `Translations.byText()`: Supports `String` themselves as translation keys, organized per
