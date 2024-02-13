@@ -205,6 +205,10 @@ abstract class Translations< //
   ///              });
   /// ```
   ///
+  /// IMPORTANT: You can create your own class and use its objects as identifiers, but it
+  /// must implement the `==` and `hashCode` methods. Otherwise, it won't be possible to
+  /// find it as one of the translation keys.
+  ///
   /// See also:
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byLocale], where you provide all translations together for each locale.

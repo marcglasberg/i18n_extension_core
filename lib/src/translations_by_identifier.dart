@@ -62,6 +62,10 @@ import 'utils.dart';
 ///              });
 /// ```
 ///
+/// IMPORTANT: You can create your own class and use its objects as identifiers, but it
+/// must implement the `==` and `hashCode` methods. Otherwise, it won't be possible to
+/// find it as one of the translation keys.
+///
 /// ---
 /// This class is NOT visible anywhere:
 /// Not in [i18_exception] and NOT in [i18_exception_core].
