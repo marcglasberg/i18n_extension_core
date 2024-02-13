@@ -60,16 +60,16 @@ void main() {
     //
     /// TODO: Uncomment if necessary:
 //    // This should work ok (and not do anything).
-//    var x = Translations("en_us") + {};
+//    var x = Translations.byText("en_us") + {};
 //
 //    // This works ok too, because the "" locale means "any" the default.
-//    var y = Translations("en_us") + {"": "some text"};
+//    var y = Translations.byText("en_us") + {"": "some text"};
   });
 }
 
 extension Localization on String {
   //
-  static final _t = Translations("en_us") +
+  static final _t = Translations.byText("en_us") +
       {
         "en_us": "Hello",
         "pt_br": "Olá",

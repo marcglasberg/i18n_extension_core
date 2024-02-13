@@ -8,11 +8,11 @@ import 'translations.dart';
 class TranslatedString {
   //
   final String locale;
-  final String text;
+  final Object? key;
 
   TranslatedString({
     required this.locale,
-    required this.text,
+    required this.key,
   });
 
   /// First: The TranslatedString in the default locale.
@@ -42,8 +42,8 @@ class TranslatedString {
       other is TranslatedString &&
           runtimeType == other.runtimeType &&
           locale == other.locale &&
-          text == other.text;
+          key == other.key;
 
   @override
-  int get hashCode => locale.hashCode ^ text.hashCode;
+  int get hashCode => locale.hashCode ^ key.hashCode;
 }

@@ -41,7 +41,7 @@ import 'translations_exception.dart';
 /// The [i18_exception] package uses a different function with the same name.
 ///
 String localize(
-  String key,
+  Object? key,
   Translations translations, {
   String? locale,
 }) {
@@ -50,11 +50,11 @@ String localize(
   if (translatedStringPerLocale == null) {
     if (Translations.recordMissingKeys)
       Translations.missingKeys
-          .add(TranslatedString(locale: translations.defaultLocaleStr, text: key));
+          .add(TranslatedString(locale: translations.defaultLocaleStr, key: key));
 
     Translations.missingKeyCallback(key, translations.defaultLocaleStr);
 
-    return key;
+    return key.toString();
   }
   //
   else {
@@ -71,7 +71,7 @@ String localize(
 
     // If there's no translated string in the locale, record it.
     if (Translations.recordMissingTranslations && locale != translations.defaultLocaleStr) {
-      Translations.missingTranslations.add(TranslatedString(locale: locale, text: key));
+      Translations.missingTranslations.add(TranslatedString(locale: locale, key: key));
       Translations.missingTranslationCallback(key, locale);
     }
 
@@ -93,7 +93,7 @@ String localize(
 
     // If nothing is found, return the value or key,
     // that is the translation in the default locale.
-    return translatedStringPerLocale[translations.defaultLocaleStr] ?? key;
+    return translatedStringPerLocale[translations.defaultLocaleStr] ?? key.toString();
   }
 }
 
@@ -135,7 +135,7 @@ String _language(String locale) => locale.substring(0, 2);
 /// This function is visible only from the [i18_exception_core] package.
 /// The [i18_exception] package uses a different function with the same name.
 ///
-String localizeFill(String text, List<Object> params) => sprintf(text, params);
+String localizeFill(Object? text, List<Object> params) => sprintf(text.toString(), params);
 
 /// Returns the translated version for the plural [modifier].
 /// After getting the version, substring `%d` will be replaced with the modifier.
@@ -175,7 +175,7 @@ String localizeFill(String text, List<Object> params) => sprintf(text, params);
 ///
 String localizePlural(
   Object? modifier,
-  String key,
+  Object? key,
   Translations translations, {
   String? locale,
 }) {
@@ -299,7 +299,7 @@ int convertToIntegerModifier(Object? modifierObj) {
 ///
 String localizeVersion(
   Object modifier,
-  String key,
+  Object? key,
   Translations translations, {
   String? locale,
 }) {
@@ -344,7 +344,7 @@ String localizeVersion(
 /// The [i18_exception] package uses a different function with the same name.
 ///
 Map<String?, String> localizeAllVersions(
-  String key,
+  Object? key,
   Translations translations, {
   String? locale,
 }) {
@@ -356,7 +356,7 @@ Map<String?, String> localizeAllVersions(
   }
 
   List<String> parts = total.split(_splitter1);
-  if (parts.isEmpty) return {null: key};
+  if (parts.isEmpty) return {null: key.toString()};
 
   Map<String?, String> all = {null: parts[1]};
 
@@ -439,13 +439,13 @@ String _effectiveLocale(String? locale) => locale?.toLowerCase() ?? DefaultLocal
 /// This function is visible only from the [i18_exception_core] package.
 /// The [i18_exception] package uses a different function with the same name.
 ///
-String recordMissingKey(String key) {
+String recordMissingKey(Object? key) {
   if (Translations.recordMissingKeys)
-    Translations.missingKeys.add(TranslatedString(locale: "", text: key));
+    Translations.missingKeys.add(TranslatedString(locale: "", key: key));
 
   Translations.missingKeyCallback(key, "");
 
-  return key;
+  return key.toString();
 }
 
 const _splitter1 = "\uFFFF";

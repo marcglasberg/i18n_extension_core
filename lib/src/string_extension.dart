@@ -3,7 +3,7 @@
 /// For example:
 ///
 /// ```
-/// static var _t = Translations("en_us") +
+/// static var _t = Translations.byText("en_us") +
 /// {
 /// "en_us": "You clicked the button %d times"
 ///     .zero("You haven't clicked the button")

@@ -6,9 +6,9 @@ void main() {
   test("Empty translations.", () {
     DefaultLocale.set("en_US");
 
-    const t = ConstTranslations("en_us", {});
+    const t = ConstTranslations("en_us", <String, Map<String, String>>{});
     expect(t.length, 0);
-    expect(t.translations, {});
+    expect(t.translationByLocale_ByTranslationKey, {});
     expect(
         t.toString(),
         '\n'
@@ -17,7 +17,8 @@ void main() {
 
   test("Can't add a Map to a const translation.", () {
     DefaultLocale.set("en_US");
-    expect(() => const ConstTranslations("en_us", {}) + {"en_us": "Hi."},
+    expect(
+        () => const ConstTranslations("en_us", <String, Map<String, String>>{}) + {"en_us": "Hi."},
         throwsA(isA<UnsupportedError>()));
   });
 
@@ -27,7 +28,7 @@ void main() {
       "Hi.": {"en_us": "Hi."}
     });
     expect(t.length, 1);
-    expect(t.translations, {
+    expect(t.translationByLocale_ByTranslationKey, {
       'Hi.': {'en_us': 'Hi.'}
     });
     expect(
@@ -52,7 +53,7 @@ void main() {
 
     expect(t.length, 1);
 
-    expect(t.translations, {
+    expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
         "en_us": "Hi.",
         "en_uk": "Hi.",
@@ -83,7 +84,7 @@ void main() {
 
     expect(t.length, 2);
 
-    expect(t.translations, {
+    expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {"en_us": "Hi."},
       "Goodbye.": {"en_us": "Goodbye."}
     });
@@ -107,7 +108,7 @@ void main() {
 
     expect(t.length, 2);
 
-    expect(t.translations, {
+    expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
         "en_us": "Hi.",
         "pt_br": "Olá.",
@@ -146,7 +147,7 @@ void main() {
   test("Can add a const translation to a regular translation.", () {
     DefaultLocale.set("en_US");
 
-    var t1 = Translations("en_us") +
+    var t1 = Translations.byText("en_us") +
         {
           "en_us": "Hi.",
           "pt_br": "Olá.",
@@ -163,7 +164,7 @@ void main() {
 
     expect(t.length, 2);
 
-    expect(t.translations, {
+    expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
         "en_us": "Hi.",
         "pt_br": "Olá.",
@@ -194,11 +195,16 @@ void main() {
 
     DefaultLocale.set("en_US");
     expect(localize("Hi.", t), "Hi.");
-    expect(localize("Goodbye", t), "Goodbye");
+    expect(localize("Goodbye.", t), "Goodbye.");
 
     DefaultLocale.set("pt_BR");
     expect(localize("Hi.", t), "Olá.");
     expect(localize("Goodbye.", t), "Adeus.");
+
+    // When it doesn't find, it returns the original string.
+    // This is useful for development, when you are adding translations.
+    // Note this missing translation is added to the missing translations list.
+    expect(localize("DOESN'T FIND", t), "DOESN'T FIND");
   });
 
   test("Translate using the extension.", () {
@@ -217,7 +223,7 @@ void main() {
 
 extension Localization on String {
   //
-  static final _t = Translations("en_us") +
+  static final _t = Translations.byText("en_us") +
       {
         "en_us": "Hi.",
         "cs_cz": "Zdravím tě",

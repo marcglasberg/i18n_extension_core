@@ -1,47 +1,48 @@
+import 'package:i18n_extension_core/src/translations_by_identifier.dart';
+import 'package:i18n_extension_core/src/typedefs.dart';
+
 import 'translated_string.dart';
 import 'translations_by_locale.dart';
-import 'translations_by_string.dart';
+import 'translations_by_text.dart';
+import 'utils.dart';
 
-/// You may use this class to provide the translated strings.
+/// A [Translations] object is where you provide the translated strings.
+/// Given a "translation-key", it returns a map of translations: { locale : translated strings }.
+/// The translation-key may be the string itself that you want to translate, or an identifier.
 ///
-/// The options are:
-/// * [Translations.new] default constructor.
-/// * [ConstTranslations.new] const default constructor.
-/// * [Translations.byLocale].
+/// Glossary:
+/// * [translatable string]: The string you want to translate.
+/// * [translation-key]: The key that represents the translatable string (may be the string itself).
+/// * [locale]: The language and country code, like "en_us" or "pt_br".
+/// * [translated string]: The translated strings for a given [translation-key].
+/// * [identifier]: An immutable variable that you may use as a translation key, instead of the string itself.
 ///
 /// ---
 ///
-/// [Translations.new] example:
+/// You may use this class to
+///
+/// The options are:
+/// * [Translations.byText]
+/// * [Translations.byLocale]
+/// * [Translations.byId]
+/// * [ConstTranslations.new] which can be made const
+/// ---
+///
+/// [Translations.byText] example:
 ///
 /// ```
-/// static final t = Translations("en_us") +
+/// var t = Translations.byText("en_us") +
 ///       const {
 ///         "en_us": "i18n Demo",
 ///         "pt_br": "Demonstração i18n",
 ///       };
-/// ```
-///
-/// ---
-///
-/// [ConstTranslations.new] example:
-///
-/// ```
-/// static const t = Translations.from(
-///    "en_us",
-///    {
-///      "i18n Demo": {
-///        "en_us": "i18n Demo",
-///        "pt_br": "Demonstração i18n",
-///      }
-///    },
-/// );
 /// ```
 /// ---
 ///
 /// [Translations.byLocale] example:
 ///
 /// ```
-/// static var t = Translations.byLocale("en_us") +
+/// var t = Translations.byLocale("en_us") +
 ///   {
 ///      "en_us": {
 ///        "Hi.": "Hi.",
@@ -53,22 +54,56 @@ import 'translations_by_string.dart';
 ///      }
 ///   };
 /// ```
+/// ---
 ///
+/// [Translations.byId] example:
+///
+/// ```
+/// var t = Translations.byId<MyColors>("en_us", {
+///   MyColors.red: {
+///       "en_us": "red",
+///       "pt_br": "vermelho",
+///   },
+///   MyColors.green: {
+///       "en_us": "green",
+///       "pt_br": "Verde",
+///   });
+/// ```
+/// ---
+///
+/// [ConstTranslations.new] example:
+///
+/// ```
+/// const t = ConstTranslations(
+///    "en_us",
+///    {
+///      "i18n Demo": {
+///        "en_us": "i18n Demo",
+///        "pt_br": "Demonstração i18n",
+///      }
+///    },
+/// );
+/// ```
 /// ---
 ///
 /// IMPORTANT: You may create your own translation classes, as long as they implement this interface.
 ///
 /// This class is visible from both [i18_exception] and [i18_exception_core] packages.
 ///
-abstract class Translations<T> {
+abstract class Translations< //
+    TKEY, //
+    TRANbyLOCALE extends Map<StringLocale, StringTranslated>, //
+    TRANbyTKEY extends Map<TKEY, StringTranslated>, //
+    ADDEDMAP> //
+{
   //
 
-  /// The default [Translations.new] constructor allows you to provide all locale translations
+  /// The [Translations.byText] constructor allows you to provide all locale translations
   /// of the first translatable string, then all locale translations of the second translatable
   /// string, and so on; and then you add translations with the [+] operator. For example:
   ///
   /// ```
-  /// static final t = Translations("en_us") +
+  /// static final t = Translations.byText("en_us") +
   ///       const {
   ///         "en_us": "i18n Demo",
   ///         "pt_br": "Demonstração i18n",
@@ -76,10 +111,15 @@ abstract class Translations<T> {
   /// ```
   ///
   /// See also:
-  /// - [ConstTranslations.new], which responds better to hot reload.
+  /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  factory Translations(String defaultLocaleStr) => TranslationsByString(defaultLocaleStr);
+  static TranslationsByText byText(StringLocale defaultLocaleStr) => TranslationsByText<
+      String,
+      Map<StringLocale, StringTranslated>,
+      Map<String, StringTranslated>,
+      Map<StringLocale, StringTranslated>>(defaultLocaleStr);
 
   /// The [Translations.byLocale] constructor allows you to provide, for each locale,
   /// all translations together:
@@ -97,11 +137,95 @@ abstract class Translations<T> {
   ///      }
   ///   };
   /// ```
+  ///
   /// See also:
-  /// - [Translations.new], which uses the [+] operator to add translations.
+  /// - [Translations.byText], which lets you provide translations for strings.
+  /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  factory Translations.byLocale(String defaultLocaleStr) => TranslationsByLocale(defaultLocaleStr);
+  static TranslationsByLocale byLocale(StringLocale defaultLocaleStr) => TranslationsByLocale<
+      String,
+      Map<StringLocale, StringTranslated>,
+      Map<String, StringTranslated>,
+      Map<StringLocale, Map<StringLocale, StringTranslated>>>(defaultLocaleStr);
+
+  /// The [byId] constructor allows you to provide all locale translations related
+  /// to a first identifier, then for a second identifier, and so on. Identifiers may be
+  /// any immutable object, such as a `String`, `int`, `enum`, or any object you create.
+  ///
+  /// You should pass the generic type of the identifier. For example, to
+  /// create translations for an enum named `MyColors`: `Translations.byId<MyColors>`:
+  ///
+  /// ```dart
+  /// enum MyColors { red, green }
+  ///
+  /// var t = Translations.byId<MyColors>("en_us", {
+  ///              MyColors.red: {
+  ///                  "en_us": "red",
+  ///                  "pt_br": "vermelho",
+  ///              },
+  ///              MyColors.green: {
+  ///                  "en_us": "green",
+  ///                  "pt_br": "Verde",
+  ///              });
+  /// ```
+  ///
+  /// Note you may also add translations with the [+] operator. For example:
+  ///
+  /// ```
+  /// var t = Translations.byId<MyColors>("en_us", {
+  ///              MyColors.red: {
+  ///                  "en_us": "red",
+  ///                  "pt_br": "vermelho",
+  ///              }) +
+  ///              {
+  ///                  MyColors.green: {
+  ///                     "en_us": "green",
+  ///                     "pt_br": "Verde",
+  ///                  }
+  ///              };
+  /// ```
+  ///
+  /// If you want your identifiers to be of ANY type, you can use type `Object`
+  /// or even `Object?` (or `dynamic`). For example:
+  ///
+  /// ```
+  /// var t = Translations.byId<Object?>("en_us", {
+  ///              MyColors.red: {
+  ///                  "en_us": "red",
+  ///                  "pt_br": "vermelho",
+  ///              },
+  ///              123: {
+  ///                  "en_us": "One two three",
+  ///                  "pt_br": "Um dois três",
+  ///              },
+  ///              null: {
+  ///                  "en_us": "This is empty",
+  ///                  "pt_br": "Isso está vazio",
+  ///              });
+  /// ```
+  ///
+  /// See also:
+  /// - [Translations.byText], which lets you provide translations for strings.
+  /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [ConstTranslations.new], which responds better to hot reload.
+  ///
+  static TranslationsByIdentifier<
+      TKEY, // The type of the translation-key.
+      Map<StringLocale, StringTranslated>, // Translation strings by locale.
+      Map<TKEY, StringTranslated>, // Translation strings by translation-key.
+      Map<TKEY, Map<StringLocale, StringTranslated>> // Shape of the added map for operator +.
+      > byId<TKEY>(StringLocale defaultLocaleStr,
+          Map<TKEY, Map<StringLocale, StringTranslated>> translationByLocale_ByTranslationKey) =>
+      TranslationsByIdentifier<
+          TKEY, // The type of the translation-key.
+          Map<StringLocale, StringTranslated>, // Translation strings by locale.
+          Map<TKEY, StringTranslated>, // Translation strings by translation-key.
+          Map<TKEY, Map<StringLocale, StringTranslated>> // Shape of the added map for operator +.
+          >(
+        defaultLocaleStr,
+        translationByLocale_ByTranslationKey,
+      );
 
   /// All missing keys and translations will be put here.
   /// This may be used in tests to make sure no translations are missing.
@@ -112,54 +236,67 @@ abstract class Translations<T> {
   static bool recordMissingTranslations = true;
 
   /// Replace this to log missing keys.
-  static void Function(String, String) missingKeyCallback =
+  static void Function(Object? key, StringLocale locale) missingKeyCallback =
       (key, locale) => print("➜ Translation key in '$locale' is missing: \"$key\".");
 
   /// Replace this to log missing translations.
-  static void Function(String, String) missingTranslationCallback =
+  static void Function(Object? key, StringLocale locale) missingTranslationCallback =
       (key, locale) => print("➜ There are no translations in '$locale' for \"$key\".");
 
   /// Generative constructor.
   const Translations.gen({
-    required this.translations,
+    required this.translationByLocale_ByTranslationKey,
     required this.defaultLocaleStr,
   });
 
-  final Map<String, Map<String, String>> translations;
+  /// Something like:
+  ///       'Hi': { // TKEY
+  ///         'en_us': 'Hi', // LOCALE : TRAN
+  ///         'pt_br': 'Olá', // LOCALE : TRAN
+  ///       },
+  ///       'Goodbye': { // TKEY
+  ///         'en_us': 'Goodbye', // LOCALE : TRAN
+  ///         'pt_br': 'Adeus', // LOCALE : TRAN
+  ///       }
+  final Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey;
 
-  final String defaultLocaleStr;
+  final StringLocale defaultLocaleStr;
 
-  String get defaultLanguageStr => TranslationsByString.trim(defaultLocaleStr).substring(0, 2);
+  String get defaultLanguageStr => normalizeLocale(defaultLocaleStr).substring(0, 2);
 
+  /// Returns the number of translation-keys.
+  /// For example, if you have translations for "Hi" and "Goodbye", this will return 2.
   int get length;
 
-  /// Add a [Map] of translations to a [Translations] object.
-  Translations operator +(T translations);
+  /// Add a [addedMap] (of type [Map]) to a [Translations] object.
+  Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator +(ADDEDMAP addedMap);
 
-  /// Add the translations of a [Translations] object to another [Translations] object.
+  /// Add a [translationsObj] object to another [Translations] object.
   ///
   /// Example:
   ///
   /// ```
-  /// var t1 = Translations("en_us") + {"en_us": "Hi.", "pt_br": "Olá."};
-  /// var t2 = Translations("en_us") + {"en_us": "Goodbye.", "pt_br": "Adeus."};
+  /// var t1 = Translations.byText("en_us") + {"en_us": "Hi.", "pt_br": "Olá."};
+  /// var t2 = Translations.byText("en_us") + {"en_us": "Goodbye.", "pt_br": "Adeus."};
   ///
   /// var translations = t1 * t2;
   /// print(localize("Hi.", translations, locale: "pt_br");
   ///
-  Translations<T> operator *(Translations<T> translations);
+  Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
+      Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translationsObj);
 
-  Map<String, String>? operator [](String key) => translations[key];
+  /// Given a translations [key], returns a [Map] of translations for that key.
+  /// The map will have the locale as the key, and the translation as the value.
+  TRANbyLOCALE? operator [](TKEY key) => translationByLocale_ByTranslationKey[key];
 }
 
-/// The [ConstTranslations] constructor allows you to define the translations
+/// The [ConstTranslations] class allows you to define the translations
 /// as a const object, all at once. This not only is a little bit more
 /// efficient, but it's also better for "hot reload", since a const variable
 /// will respond to hot reloads, while `final` variables will not.
 ///
-/// Here, just like with [Translations.new], you provide all locale translations
-/// of the first single "translatable string", then all locale translations of
-/// the second one, and so on.
+/// Here you provide all locale translations of the first "translatable string",
+/// then all locale translations of the second one, and so on.
 ///
 /// ```
 /// static const t = Translations.from(
@@ -173,14 +310,15 @@ abstract class Translations<T> {
 /// );
 /// ```
 ///
-/// See also:
-/// - [Translations.new], which uses the [+] operator to add translations.
-/// - [ConstTranslations.byLocale], which organizes translations differently.
-///
 /// ---
 /// This class is visible from both [i18_exception] and [i18_exception_core] packages.
 ///
-class ConstTranslations extends TranslationsByString {
+class ConstTranslations< //
+        TKEY extends String, //
+        TRANbyLOCALE extends Map<StringLocale, StringTranslated>, //
+        TRANbyTKEY extends Map<TKEY, StringTranslated>, //
+        ADDEDMAP extends TRANbyLOCALE> //
+    extends TranslationsByText<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> {
   //
 
   /// The [ConstTranslations] constructor allows you to define the translations
@@ -188,9 +326,8 @@ class ConstTranslations extends TranslationsByString {
   /// efficient, but it's also better for "hot reload", since a const variable
   /// will respond to hot reloads, while `final` variables will not.
   ///
-  /// Here, just like with [Translations.new], you provide all locale translations
-  /// of the first single "translatable string", then all locale translations of
-  /// the second one, and so on.
+  /// Here you provide all locale translations of the first "translatable string",
+  /// then all locale translations of the second one, and so on.
   ///
   /// ```
   /// static const t = Translations.from(
@@ -205,21 +342,23 @@ class ConstTranslations extends TranslationsByString {
   /// ```
   ///
   /// See also:
-  /// - [Translations.new], which uses the [+] operator to add translations.
+  /// - [Translations.byText], which lets you provide translations for strings.
+  /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [ConstTranslations.new], which organizes translations differently.
   ///
   const ConstTranslations(
-    String defaultLocaleStr,
-    Map<String, Map<String, String>> translations,
+    StringLocale defaultLocaleStr,
+    Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey,
   ) : super.gen(
           defaultLocaleStr,
-          translations,
+          translationByLocale_ByTranslationKey,
         );
 
   /// You can't add a <Map> to a `ConstTranslations`.
   /// Which means operator `+` is not supported for `ConstTranslations`.
   @override
-  Translations<Map<String, String>> operator +(Map<String, String> translations) {
+  Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator +(ADDEDMAP addedMap) {
     throw UnsupportedError("Operator `+` is not supported for class `ConstTranslations`.");
   }
 
@@ -228,17 +367,18 @@ class ConstTranslations extends TranslationsByString {
   ///
   /// ```dart
   /// // Doesn't work:
-  /// var t = const ConstTranslations("en_us", {...}}) + Translations("en_us");
+  /// var t = const ConstTranslations("en_us", {...}}) + Translations.byText("en_us");
   /// ```
   ///
   /// However, you can add a `ConstTranslations` to a regular `Translations`:
   ///
   /// ```dart
   /// // Works:
-  /// var t = Translations("en_us") + const ConstTranslations("en_us", {...}});
+  /// var t = Translations.byText("en_us") + const ConstTranslations("en_us", {...}});
   /// ```
   @override
-  Translations<Map<String, String>> operator *(Translations<Map<String, String>> translations) {
+  Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
+      Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translations) {
     throw UnsupportedError("Operator `*` is not supported for class `ConstTranslations`.");
   }
 }

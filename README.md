@@ -23,7 +23,7 @@ the [i18n_extension](https://pub.dev/packages/i18n_extension) package._
   import 'package:i18n_extension_core/i18n_extension_core.dart';
   
   extension Localization on String {
-    static var t = Translations("en_us") + {"en_us":"Hello", "pt_br":"Hola"};
+    static var t = Translations.byText("en_us") + {"en_us":"Hello", "pt_br":"Hola"};
     String get i18n => localize(this, t);
   }
   

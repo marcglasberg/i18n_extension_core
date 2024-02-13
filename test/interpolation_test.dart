@@ -17,7 +17,7 @@ void main() {
 
 extension Localization on String {
   //
-  static final _t = Translations("en_us") +
+  static final _t = Translations.byText("en_us") +
       {
         "en_us": "Hello %s, this is %s.",
         "pt_br": "Olá %s, aqui é %s.",
