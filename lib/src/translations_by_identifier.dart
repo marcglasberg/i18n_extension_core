@@ -81,8 +81,7 @@ class TranslationsByIdentifier< //
   TranslationsByIdentifier(
     String defaultLocaleStr,
     Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey,
-  )   : assert(normalizeLocale(defaultLocaleStr).isNotEmpty),
-        super.gen(
+  ) : super.gen(
           defaultLocaleStr: normalizeLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: translationByLocale_ByTranslationKey,
         );

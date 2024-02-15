@@ -97,11 +97,11 @@ String localize(
   }
 }
 
-/// "pt" is a general locale, because is just a language, while "pt_br" is not.
-bool _isGeneral(String locale) => locale.length == 2 && !locale.contains("_");
+/// "pt" is a general locale, because it's just a language, while "pt_br" is not.
+bool _isGeneral(String locale) => !locale.contains("_");
 
-/// The language must be the first 2 chars, otherwise this won't work.
-String _language(String locale) => locale.substring(0, 2);
+/// The language must be everything before the underscore, otherwise this won't work.
+String _language(String locale) => locale.split('_')[0];
 
 /// Does an `sprintf` on the [text] with the [params].
 /// This is implemented with the `sprintf` package: https://pub.dev/packages/sprintf

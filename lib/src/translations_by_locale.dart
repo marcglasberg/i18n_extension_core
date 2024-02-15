@@ -1,3 +1,5 @@
+import 'package:i18n_extension_core/src/utils.dart';
+
 import 'translations.dart';
 import 'translations_by_text.dart';
 import 'translations_exception.dart';
@@ -42,8 +44,8 @@ class TranslationsByLocale< //
   TranslationsByLocale(String defaultLocaleStr)
       : byKey = TranslationsByText(defaultLocaleStr),
         super.gen(
+          defaultLocaleStr: normalizeLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
-          defaultLocaleStr: defaultLocaleStr,
         );
 
   /// Adds a Map [addedMap] of translations to a [Translations] object. Example:
@@ -133,10 +135,14 @@ class TranslationsByLocale< //
   }
 
   @override
-  String get defaultLanguageStr => byKey.defaultLanguageStr;
-
-  @override
   String get defaultLocaleStr => byKey.defaultLocaleStr;
+
+  /// To extract the language code from a locale identifier, we typically parse the identifier
+  /// and take the first part before any underscore. The language code is always at the
+  /// beginning of the locale identifier and is separated from any subsequent parts
+  /// (like country/region or script) by an underscore.
+  @override
+  String get defaultLanguageStr => byKey.defaultLanguageStr;
 
   /// Returns the number of translation-keys.
   /// For example, if you have translations for "Hi" and "Goodbye", this will return 2.

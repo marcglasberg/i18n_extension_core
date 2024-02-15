@@ -32,8 +32,7 @@ class TranslationsByText< //
     extends Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> {
   //
   TranslationsByText(String defaultLocaleStr)
-      : assert(normalizeLocale(defaultLocaleStr).isNotEmpty),
-        super.gen(
+      : super.gen(
           defaultLocaleStr: normalizeLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{},
         );

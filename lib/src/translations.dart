@@ -4,7 +4,7 @@ import 'package:i18n_extension_core/src/typedefs.dart';
 import 'translated_string.dart';
 import 'translations_by_locale.dart';
 import 'translations_by_text.dart';
-import 'utils.dart';
+import 'utils.dart' as utils;
 
 /// A [Translations] object is where you provide the translated strings.
 /// Given a "translation-key", it returns a map of translations: { locale : translated strings }.
@@ -266,7 +266,11 @@ abstract class Translations< //
 
   final StringLocale defaultLocaleStr;
 
-  String get defaultLanguageStr => normalizeLocale(defaultLocaleStr).substring(0, 2);
+  /// To extract the language code from a locale identifier, we typically parse the identifier
+  /// and take the first part before any underscore. The language code is always at the
+  /// beginning of the locale identifier and is separated from any subsequent parts
+  /// (like country/region or script) by an underscore.
+  String get defaultLanguageStr => utils.normalizeLocale(defaultLocaleStr).split('_')[0];
 
   /// Returns the number of translation-keys.
   /// For example, if you have translations for "Hi" and "Goodbye", this will return 2.
@@ -303,8 +307,7 @@ abstract class Translations< //
 /// then all locale translations of the second one, and so on.
 ///
 /// ```
-/// static const t = Translations.from(
-///    "en_us",
+/// static const t = ConstTranslations("en_us",
 ///    {
 ///      "i18n Demo": {
 ///        "en_us": "i18n Demo",
@@ -313,6 +316,10 @@ abstract class Translations< //
 ///    },
 /// );
 /// ```
+///
+/// IMPORTANT: Make sure the [defaultLocaleStr] you provide is correct (no spaces, lowercase etc).
+/// Since this constructor is const, we can't normalize the locale string for you. If you are
+/// not sure, call [ConstTranslations.normalizeLocale] before using it.
 ///
 /// ---
 /// This class is visible from both [i18_exception] and [i18_exception_core] packages.
@@ -334,8 +341,7 @@ class ConstTranslations< //
   /// then all locale translations of the second one, and so on.
   ///
   /// ```
-  /// static const t = Translations.from(
-  ///    "en_us",
+  /// static const t = ConstTranslations("en_us",
   ///    {
   ///      "i18n Demo": {
   ///        "en_us": "i18n Demo",
@@ -344,6 +350,10 @@ class ConstTranslations< //
   ///    },
   /// );
   /// ```
+  ///
+  /// IMPORTANT: Make sure the [defaultLocaleStr] you provide is correct (no spaces, lowercase etc).
+  /// Since this constructor is const, we can't normalize the locale string for you. If you are
+  /// not sure, call [ConstTranslations.normalizeLocale] before using it.
   ///
   /// See also:
   /// - [Translations.byText], which lets you provide translations for strings.
@@ -358,6 +368,20 @@ class ConstTranslations< //
           defaultLocaleStr,
           translationByLocale_ByTranslationKey,
         );
+
+  /// * Removes all spaces (and similar chars that are generally removed with the trim method).
+  /// * Turns all hyphens into underscores.
+  /// * Turns double (or more underscores) into a single underscore.
+  /// * Trims leading and trailing underscores.
+  /// * Turns the locale into lowercase.
+  /// * Throws a [TranslationsException] if the locale has more than 20 characters or fewer than 2.
+  /// Examples:
+  /// * ` en_us_ ` becomes `en_us`.
+  /// * ` en__us_ ` becomes `en_us`.
+  /// * ` en-us ` becomes `en_us`.
+  /// * `en-` becomes `en`.
+  ///
+  static String normalizeLocale(String locale) => utils.normalizeLocale(locale);
 
   /// You can't add a <Map> to a `ConstTranslations`.
   /// Which means operator `+` is not supported for `ConstTranslations`.
