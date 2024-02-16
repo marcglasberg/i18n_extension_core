@@ -29,7 +29,13 @@ the [i18n_extension](https://pub.dev/packages/i18n_extension) package._
   
   DefaultLocale.set("es_ES");
   expect("Hello".i18n, "Hola");
-  ```                                                                                       
+  ```                                                              
+
+  > Note: When using [Celest](https://celest.dev/), this is especially useful for translating the
+  exception messages that the backend throws to the frontend. For example,
+  throwing `MyException('The password you typed is invalid'.i18n);` in the backend, will
+  reach the frontend already translated
+  as `MyException('La contraseña que ingresaste no es válida')` if the user device is in Spanish.
 
 ## Documentation
 
