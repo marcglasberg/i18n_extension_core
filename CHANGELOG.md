@@ -1,11 +1,11 @@
-## 2.0.2
+## 2.0.3
 
 * Translations:
-    - `Translations.byText()`: Supports `String` themselves as translation keys, organized per
+    - `Translations.byText()`: Supports `String` themselves as translation-keys, organized per
       key.
-    - `Translations.byLocale()`: Supports `String` themselves as translation keys, organized per
+    - `Translations.byLocale()`: Supports `String` themselves as translation-keys, organized per
       locale.
-    - `Translations.byId<T>()`: Supports any object (of type `T`) as translation keys.
+    - `Translations.byId<T>()`: Supports any object (of type `T`) as translation-keys.
     - `const ConstTranslations()`: Supports defining translations with a `const` Map.
 
 ## 1.0.0

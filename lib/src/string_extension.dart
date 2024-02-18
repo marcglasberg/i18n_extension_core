@@ -29,6 +29,7 @@ extension Localization on String {
   static const _splitter1 = "\uFFFF";
   static const _splitter2 = "\uFFFE";
 
+  /// Creates a modifier for the given [identifier] and [text].
   String modifier(Object identifier, String text) =>
       ((!startsWith(_splitter1)) ? _splitter1 : "") //
       +

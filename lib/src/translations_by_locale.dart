@@ -37,10 +37,39 @@ class TranslationsByLocale< //
   //
   final TranslationsByText<TKEY, TRANbyLOCALE, TRANbyTKEY, TRANbyLOCALE> byKey;
 
+  /// Returns the Map of translations by locale, by translation-key.
+  /// It's something like this:
+  ///
+  ///       'Hi': { // TKEY
+  ///         'en_us': 'Hi', // LOCALE : TRAN
+  ///         'pt_br': 'Olá', // LOCALE : TRAN
+  ///       },
+  ///       'Goodbye': { // TKEY
+  ///         'en_us': 'Goodbye', // LOCALE : TRAN
+  ///         'pt_br': 'Adeus', // LOCALE : TRAN
+  ///       }
   @override
   Map<TKEY, TRANbyLOCALE> get translationByLocale_ByTranslationKey =>
       byKey.translationByLocale_ByTranslationKey;
 
+  /// The default constructor of [TranslationsByLocale] allows you to provide all
+  /// translations together for each locale.
+  ///
+  /// It may be instantiated with the [Translations.byLocale] constructor.
+  ///
+  /// ```
+  /// static var t = Translations.byLocale("en_us") +
+  ///   {
+  ///      "en_us": {
+  ///        "Hi.": "Hi.",
+  ///        "Goodbye.": "Goodbye.",
+  ///      },
+  ///      "es_es": {
+  ///        "Hi.": "Hola.",
+  ///        "Goodbye.": "Adiós.",
+  ///      }
+  ///   };
+  /// ```
   TranslationsByLocale(String defaultLocaleStr)
       : byKey = TranslationsByText(defaultLocaleStr),
         super.gen(
@@ -149,6 +178,7 @@ class TranslationsByLocale< //
   @override
   int get length => byKey.length;
 
+  /// Prints the translations in a human-readable format.
   @override
   String toString() => byKey.toString();
 

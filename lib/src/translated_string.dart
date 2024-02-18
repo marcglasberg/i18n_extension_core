@@ -7,9 +7,13 @@ import 'translations.dart';
 ///
 class TranslatedString {
   //
+  /// The locale of the translation.
   final String locale;
+
+  /// The translation-key.
   final Object? key;
 
+  /// Creates a new instance of [TranslatedString] with the given [locale] and [key].
   TranslatedString({
     required this.locale,
     required this.key,

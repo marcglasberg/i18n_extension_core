@@ -64,7 +64,7 @@ import 'utils.dart';
 ///
 /// IMPORTANT: You can create your own class and use its objects as identifiers, but it
 /// must implement the `==` and `hashCode` methods. Otherwise, it won't be possible to
-/// find it as one of the translation keys.
+/// find it as one of the translation-keys.
 ///
 /// ---
 /// This class is NOT visible anywhere:
@@ -78,6 +78,69 @@ class TranslationsByIdentifier< //
         > //
     extends Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> {
   //
+
+  /// The default constructor of [TranslationsByIdentifier] allows you to provide all locale
+  /// translations related to a first identifier, then for a second identifier, and so on.
+  /// Identifiers may be any immutable object, such as a `String`, `int`, `enum`, or any object
+  /// you create.
+  ///
+  /// It may be instantiated with the default [Translations.byId] constructor.
+  /// You should pass the generic type of the identifier. For example, to
+  /// create translations for an enum named `MyColors`: `Translations.byId<MyTranslations>`:
+  ///
+  /// ```dart
+  /// enum MyColors { red, green }
+  ///
+  /// var t = Translations.byId<MyTranslations>("en_us", {
+  ///              MyColors.red: {
+  ///                  "en_us": "red",
+  ///                  "pt_br": "vermelho",
+  ///              },
+  ///              MyColors.green: {
+  ///                  "en_us": "green",
+  ///                  "pt_br": "Verde",
+  ///              });
+  /// ```
+  ///
+  /// Note you may also add translations with the [+] operator. For example:
+  ///
+  /// ```
+  /// var t = Translations.byId<MyTranslations>("en_us", {
+  ///              MyColors.red: {
+  ///                  "en_us": "red",
+  ///                  "pt_br": "vermelho",
+  ///              }) +
+  ///              {
+  ///                  MyColors.green: {
+  ///                     "en_us": "green",
+  ///                     "pt_br": "Verde",
+  ///                  }
+  ///              };
+  /// ```
+  ///
+  /// If you want your identifiers to be of ANY type, you can use type `Object`
+  /// or even `Object?` (or `dynamic`). For example:
+  ///
+  /// ```
+  /// var t = Translations.byId<Object?>("en_us", {
+  ///              MyColors.red: {
+  ///                  "en_us": "red",
+  ///                  "pt_br": "vermelho",
+  ///              },
+  ///              123: {
+  ///                  "en_us": "One two three",
+  ///                  "pt_br": "Um dois três",
+  ///              },
+  ///              null: {
+  ///                  "en_us": "This is empty",
+  ///                  "pt_br": "Isso está vazio",
+  ///              });
+  /// ```
+  ///
+  /// IMPORTANT: You can create your own class and use its objects as identifiers, but it
+  /// must implement the `==` and `hashCode` methods. Otherwise, it won't be possible to
+  /// find it as one of the translation-keys.
+  ///
   TranslationsByIdentifier(
     String defaultLocaleStr,
     Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey,
@@ -209,6 +272,7 @@ class TranslationsByIdentifier< //
     _translations[locale] = stringTranslated;
   }
 
+  /// Prints the translations in a human-readable format.
   @override
   String toString() {
     String text = "\nTranslations: ---------------\n";
@@ -229,69 +293,3 @@ class TranslationsByIdentifier< //
   static const _splitter1 = "\uFFFF";
   static const _splitter2 = "\uFFFE";
 }
-
-// ----------------------------------------------------------------------------------------
-
-/// The [TranslationsById] constructor allows you to use any type of "identifiers"
-/// as translation keys. You can define the keys as `final` or `const` values in
-/// your translations file, and then use the [IdTranslations.new] constructor.
-/// For example:
-///
-/// ```dart
-///  import 'package:i18n_extension/i18n_extension.dart';
-///
-///  const appbarTitle = "appbarTitle";
-///  const greetings = "greetings";
-///  const increment = "increment";
-///  const changeLanguage = "changeLanguage";
-///  const youClickedThisNumberOfTimes = "youClickedThisNumberOfTimes";
-///
-///  extension Localization on String {
-///
-///   static final _t = Translations.byId("en_us", {
-///     appbarTitle: {
-///       "en_us": "i18n Demo",
-///       "pt_br": "Demonstração i18n",
-///     },
-///     greetings: {
-///       "en_us": "This example demonstrates how to use identifiers as keys.\n\n"
-///           "For example, you can write:\n"
-///           "helloThere.i18n\n"
-///           "instead of\n"
-///           "\"Hello There\".i18n",
-///       "pt_br": "Este exemplo demonstra como usar identificadores como chaves.\n\n"
-///           "Por exemplo, você pode escrever:\n"
-///           "saudacao.i18n\n"
-///           "em vez de\n"
-///           "\"Olá como vai\".i18n",
-///     },
-///     increment: {
-///       "en_us": "Increment",
-///       "pt_br": "Incrementar",
-///     },
-///     changeLanguage: {
-///       "en_us": "Change Language",
-///       "pt_br": "Mude Idioma",
-///     },
-///     youClickedThisNumberOfTimes: {
-///       "en_us": "You clicked the button %d times:"
-///           .zero("You haven't clicked the button:")
-///           .one("You clicked it once:")
-///           .two("You clicked a couple times:")
-///           .many("You clicked %d times:")
-///           .times(12, "You clicked a dozen times:"),
-///       "pt_br": "Você clicou o botão %d vezes:"
-///           .zero("Você não clicou no botão:")
-///           .one("Você clicou uma única vez:")
-///           .two("Você clicou um par de vezes:")
-///           .many("Você clicou %d vezes:")
-///           .times(12, "Você clicou uma dúzia de vezes:"),
-///     }
-///   });
-///
-///   String get i18n => localize(this, _t);
-///
-///   String fill(List<Object> params) => localizeFill(this, params);
-///
-///   String plural(value) => localizePlural(value, this, _t);
-/// }

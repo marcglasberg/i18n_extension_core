@@ -31,6 +31,21 @@ class TranslationsByText< //
         > //
     extends Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> {
   //
+
+  /// The default constructor of [TranslationsByText] allows you to provide all locale translations
+  /// of the first translatable string, then all locale translations of the second translatable
+  /// string, and so on.
+  ///
+  /// It may be instantiated with the default [Translations.byText] constructor,
+  /// and then you add translations with the [+] operator. For example:
+  ///
+  /// ```
+  /// static final t = Translations.byText("en_us") +
+  ///       const {
+  ///         "en_us": "i18n Demo",
+  ///         "pt_br": "Demonstração i18n",
+  ///       };
+  /// ```
   TranslationsByText(String defaultLocaleStr)
       : super.gen(
           defaultLocaleStr: normalizeLocale(defaultLocaleStr),
@@ -185,6 +200,7 @@ class TranslationsByText< //
     _translations[locale] = stringTranslated;
   }
 
+  /// Prints the translations in a human-readable format.
   @override
   String toString() {
     String text = "\nTranslations: ---------------\n";

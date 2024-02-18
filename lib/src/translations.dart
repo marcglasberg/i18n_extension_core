@@ -15,7 +15,7 @@ import 'utils.dart' as utils;
 /// * [translation-key]: The key that represents the translatable string (may be the string itself).
 /// * [locale]: The language and country code, like "en_us" or "pt_br".
 /// * [translated string]: The translated strings for a given [translation-key].
-/// * [identifier]: An immutable variable that you may use as a translation key, instead of the string itself.
+/// * [identifier]: An immutable variable that you may use as a translation-key, instead of the string itself.
 ///
 /// ---
 ///
@@ -207,7 +207,7 @@ abstract class Translations< //
   ///
   /// IMPORTANT: You can create your own class and use its objects as identifiers, but it
   /// must implement the `==` and `hashCode` methods. Otherwise, it won't be possible to
-  /// find it as one of the translation keys.
+  /// find it as one of the translation-keys.
   ///
   /// See also:
   /// - [Translations.byText], which lets you provide translations for strings.
@@ -236,12 +236,15 @@ abstract class Translations< //
   static Set<TranslatedString> missingKeys = {};
   static Set<TranslatedString> missingTranslations = {};
 
+  /// If true, records missing keys.
   static bool recordMissingKeys = true;
+
+  /// If true, records missing translations.
   static bool recordMissingTranslations = true;
 
   /// Replace this to log missing keys.
   static void Function(Object? key, StringLocale locale) missingKeyCallback =
-      (key, locale) => print("➜ Translation key in '$locale' is missing: \"$key\".");
+      (key, locale) => print("➜ Translation-key in '$locale' is missing: \"$key\".");
 
   /// Replace this to log missing translations.
   static void Function(Object? key, StringLocale locale) missingTranslationCallback =
@@ -253,7 +256,9 @@ abstract class Translations< //
     required this.defaultLocaleStr,
   });
 
-  /// Something like:
+  /// Map of translations by locale, by translation-key.
+  /// It's something like this:
+  ///
   ///       'Hi': { // TKEY
   ///         'en_us': 'Hi', // LOCALE : TRAN
   ///         'pt_br': 'Olá', // LOCALE : TRAN
@@ -264,6 +269,7 @@ abstract class Translations< //
   ///       }
   final Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey;
 
+  /// The default locale, as a [String].
   final StringLocale defaultLocaleStr;
 
   /// To extract the language code from a locale identifier, we typically parse the identifier
