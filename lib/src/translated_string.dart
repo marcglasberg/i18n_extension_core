@@ -41,6 +41,9 @@ class TranslatedString {
       };
 
   @override
+  String toString() => 'TranslatedString{locale: $locale, key: $key}';
+
+  @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TranslatedString &&
