@@ -115,7 +115,7 @@ abstract class Translations< //
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  static TranslationsByText byText(StringLocale defaultLocaleStr) => TranslationsByText<
+  static Translations byText(StringLocale defaultLocaleStr) => TranslationsByText<
       String,
       Map<StringLocale, StringTranslated>,
       Map<String, StringTranslated>,
@@ -143,7 +143,7 @@ abstract class Translations< //
   /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  static TranslationsByLocale byLocale(StringLocale defaultLocaleStr) => TranslationsByLocale<
+  static Translations byLocale(StringLocale defaultLocaleStr) => TranslationsByLocale<
       String,
       Map<StringLocale, StringTranslated>,
       Map<String, StringTranslated>,
@@ -214,12 +214,7 @@ abstract class Translations< //
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  static TranslationsByIdentifier<
-      TKEY, // The type of the translation-key.
-      Map<StringLocale, StringTranslated>, // Translation strings by locale.
-      Map<TKEY, StringTranslated>, // Translation strings by translation-key.
-      Map<TKEY, Map<StringLocale, StringTranslated>> // Shape of the added map for operator +.
-      > byId<TKEY>(StringLocale defaultLocaleStr,
+  static Translations byId<TKEY>(StringLocale defaultLocaleStr,
           Map<TKEY, Map<StringLocale, StringTranslated>> translationByLocale_ByTranslationKey) =>
       TranslationsByIdentifier<
           TKEY, // The type of the translation-key.

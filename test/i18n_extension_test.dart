@@ -33,7 +33,7 @@ void main() {
   test("Add translation in many languages.", () {
     DefaultLocale.set("en_US");
 
-    var t = Translations.byText("en_us") +
+    Translations t = Translations.byText("en_us") +
         {
           "cs_cz": "Ahoj.",
           "en_us": "Hi.",
@@ -408,7 +408,7 @@ void main() {
           }
         };
 
-    var t2 = Translations.byLocale("en_us") +
+    Translations t2 = Translations.byLocale("en_us") +
         {
           "pt_br": {
             "Hi.": "Olá.",
