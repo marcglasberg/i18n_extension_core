@@ -1,4 +1,4 @@
-[![pub package](https://img.shields.io/pub/v/i18n_extension_core.svg)](https://pub.dartlang.org/packages/i18n_extension)
+[![pub package](https://img.shields.io/pub/v/i18n_extension_core.svg)](https://pub.dartlang.org/packages/i18n_extension_core)
 
 # i18n_extension_core
 
