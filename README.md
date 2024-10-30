@@ -1,3 +1,5 @@
+[![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+
 [![pub package](https://img.shields.io/pub/v/i18n_extension_core.svg)](https://pub.dartlang.org/packages/i18n_extension_core)
 
 # i18n_extension_core
@@ -95,4 +97,3 @@ _https://medium.com/@marcglasberg_<br>
 *My article in the official Flutter documentation*:
 
 * <a href="https://flutter.dev/docs/development/ui/layout/constraints">Understanding constraints</a>
-

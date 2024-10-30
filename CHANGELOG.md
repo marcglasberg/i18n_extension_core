@@ -1,3 +1,9 @@
+## 2.0.7
+
+* Sponsored by [MyText.ai](https://mytext.ai)
+
+[![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+
 ## 2.0.6
 
 * Translations:
