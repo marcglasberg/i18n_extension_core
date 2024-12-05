@@ -319,9 +319,9 @@ abstract class Translations< //
 /// ```
 ///
 /// IMPORTANT: Make sure the [defaultLocaleStr] you provide is a syntactically valid
-/// Unicode BCP47 Locale Identifier. Since this constructor is const, we can't normalize
-/// the locale string for you. If you are not sure, call [ConstTranslations.normalizeLocale]
-/// before using it.
+/// IETF BCP47 language tag (which is compatible with the Unicode Locale Identifier (ULI)
+/// syntax). Since this constructor is const, we can't normalize the locale string for
+/// you. If you are not sure, call [ConstTranslations.normalizeLocale] before using it.
 ///
 /// ---
 /// This class is visible from both [i18_exception] and [i18_exception_core] packages.

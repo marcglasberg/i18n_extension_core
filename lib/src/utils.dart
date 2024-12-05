@@ -1,13 +1,11 @@
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 
-/// Checks if the given locale identifier is a valid BCP47 locale string.
+/// Returns true if the given locale identifier seems to be a valid BCP47 language tag
+/// (compatible with the Unicode Locale Identifier (ULI) syntax).
 ///
-/// A valid BCP47 locale identifier consists of a language subtag (mandatory),
-/// and optional script, region, variant, extension, and private use subtags.
+/// It should consist of a language subtag (mandatory), and optional script, region,
+/// variant, extension, and private use subtags.
 ///
-/// - [locale]: The locale identifier string to be validated.
-///
-/// Returns `true` if the [locale] is a valid BCP47 locale identifier, otherwise `false`.
 bool isValidLocale(String locale) {
   // Split the locale by hyphen
   List<String> parts = locale.split('-');
@@ -96,7 +94,9 @@ bool _isTitleCaseScript(String str) =>
     str.length == 4 && _isUpper(str[0]) && _isAlpha(str.substring(1));
 
 /// This function throws a [TranslationsException] if the locale is not a valid BCP47
-/// locale identifier. If it's valid, it returns the locale, unchanged.
+/// language tag (compatible with the Unicode Locale Identifier (ULI) syntax).
+///
+/// If it's valid, it returns the locale, unchanged.
 ///
 /// The most common language identifiers are generally two ('en') or five ('en-US)'
 /// letters. They follow a standard format, which can vary in length depending on the
@@ -141,11 +141,11 @@ String checkLocale(String locale) {
     String normalized = DefaultLocale.normalizeLocale(locale) ?? '';
     if (isValidLocale(normalized))
       throw TranslationsException(
-          'Locale "$locale" is not a valid BCP47 locale identifier. '
+          'Locale "$locale" is not a valid BCP47 language tag. '
           'Try "$normalized".');
     else
       throw TranslationsException(
-          'Locale "$locale" is not a valid BCP47 locale identifier.');
+          'Locale "$locale" is not a valid BCP47 language tag.');
   }
 
   return locale;

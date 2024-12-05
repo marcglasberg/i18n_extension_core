@@ -21,7 +21,7 @@ void main() {
         throwsA(predicate((e) =>
             e is TranslationsException &&
             e.msg ==
-                'Locale "en_us" is not a valid BCP47 locale identifier. Try "en-US".')));
+                'Locale "en_us" is not a valid BCP47 language tag. Try "en-US".')));
 
     expect(
         () => localize(

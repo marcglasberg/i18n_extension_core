@@ -6,12 +6,43 @@ void main() {
   test("String interpolations.", () {
     //
     DefaultLocale.set("en-US");
-    expect("Hello %s, this is %s.".i18n, "Hello %s, this is %s.");
-    expect("Hello %s, this is %s.".i18n.fill(["John", "Mary"]), "Hello John, this is Mary.");
+
+    expect(
+        () => localizeFill("Hello %s, this is %s.".i18n, []), throwsA(isA<RangeError>()));
+
+    expect(() => localizeFill("Hello %s, this is %s.".i18n, "John"),
+        throwsA(isA<RangeError>()));
+
+    expect(() => localizeFill("Hello %s, this is %s.".i18n, ["John"]),
+        throwsA(isA<RangeError>()));
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, ["John", "Mary"]),
+        "Hello John, this is Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, {"John", "Mary"}),
+        "Hello John, this is Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, "John", "Mary"),
+        "Hello John, this is Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, ["John", "Mary", "Eve"]),
+        "Hello John, this is Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, "John", "Mary", "Eve"),
+        "Hello John, this is Mary.");
+
+    // ---
 
     DefaultLocale.set("pt-BR");
-    expect("Hello %s, this is %s.".i18n, "Olá %s, aqui é %s.");
-    expect("Hello %s, this is %s.".i18n.fill(["John", "Mary"]), "Olá John, aqui é Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, ["John", "Mary"]),
+        "Olá John, aqui é Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, {"John", "Mary"}),
+        "Olá John, aqui é Mary.");
+
+    expect(localizeFill("Hello %s, this is %s.".i18n, "John", "Mary"),
+        "Olá John, aqui é Mary.");
   });
 }
 
@@ -24,16 +55,4 @@ extension Localization on String {
       };
 
   String get i18n => localize(this, _t);
-
-  String fill(List<Object> params) => localizeFill(this, params);
-
-  String plural(value) => localizePlural(value, this, _t);
-
-  String version(Object modifier) => localizeVersion(modifier, this, _t);
-
-  Map<String?, String> allVersions() => localizeAllVersions(this, _t);
-
-  String gender(Gender gnd) => localizeVersion(gnd, this, _t);
 }
-
-enum Gender { they, female, male }
