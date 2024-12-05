@@ -3,15 +3,15 @@
 /// For example:
 ///
 /// ```
-/// static var _t = Translations.byText("en_us") +
+/// static var _t = Translations.byText("en-US") +
 /// {
-/// "en_us": "You clicked the button %d times"
+/// "en-US": "You clicked the button %d times"
 ///     .zero("You haven't clicked the button")
 ///     .one("You clicked it once")
 ///     .two("You clicked a couple times")
 ///     .many("You clicked %d times")
 ///     .times(12, "You clicked a dozen times"),
-/// "pt_br": "Você clicou o botão %d vezes"
+/// "pt-BR": "Você clicou o botão %d vezes"
 ///     .zero("Você não clicou no botão")
 ///     .one("Você clicou uma única vez")
 ///     .two("Você clicou um par de vezes")

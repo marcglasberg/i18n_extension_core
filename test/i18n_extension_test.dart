@@ -4,9 +4,9 @@ import 'package:test/test.dart';
 void main() {
   //
   test("Empty translations.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byText("en_us");
+    var t = Translations.byText("en-US");
     expect(t.length, 0);
     expect(t.translationByLocale_ByTranslationKey, {});
     expect(
@@ -16,29 +16,29 @@ void main() {
   });
 
   test("Add translation in English only.", () {
-    DefaultLocale.set("en_US");
-    print(Translations.byText("en_us").runtimeType);
-    var t = (Translations.byText("en_us")) + {"en_us": "Hi"};
+    DefaultLocale.set("en-US");
+    print(Translations.byText("en-US").runtimeType);
+    var t = (Translations.byText("en-US")) + {"en-US": "Hi"};
     expect(t.length, 1);
     expect(t.translationByLocale_ByTranslationKey, {
-      'Hi': {'en_us': 'Hi'}
+      'Hi': {'en-US': 'Hi'}
     });
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi\n'
+        '  en-US | Hi\n'
         '-----------------------------\n');
   });
 
   test("Add translation in many languages.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    Translations t = Translations.byText("en_us") +
+    Translations t = Translations.byText("en-US") +
         {
-          "cs_cz": "Ahoj.",
-          "en_us": "Hi.",
-          "en_uk": "Hi.",
-          "pt_br": "Olá.",
+          "cs-CZ": "Ahoj.",
+          "en-US": "Hi.",
+          "en-UK": "Hi.",
+          "pt-BR": "Olá.",
           "es": "Hola.",
         };
 
@@ -46,10 +46,10 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hi.",
-        "en_uk": "Hi.",
-        "cs_cz": "Ahoj.",
-        "pt_br": "Olá.",
+        "en-US": "Hi.",
+        "en-UK": "Hi.",
+        "cs-CZ": "Ahoj.",
+        "pt-BR": "Olá.",
         "es": "Hola.",
       }
     });
@@ -57,97 +57,97 @@ void main() {
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi.\n'
-        '  en_uk | Hi.\n'
-        '  cs_cz | Ahoj.\n'
+        '  en-US | Hi.\n'
+        '  en-UK | Hi.\n'
+        '  cs-CZ | Ahoj.\n'
         '  es    | Hola.\n'
-        '  pt_br | Olá.\n'
+        '  pt-BR | Olá.\n'
         '-----------------------------\n');
   });
 
   test("Add 2 translations in a single language.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "Hi.",
+          "en-US": "Hi.",
         } +
         {
-          "en_us": "Goodbye.",
+          "en-US": "Goodbye.",
         };
 
     expect(t.length, 2);
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hi.",
+        "en-US": "Hi.",
       },
       "Goodbye.": {
-        "en_us": "Goodbye.",
+        "en-US": "Goodbye.",
       }
     });
 
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi.\n'
+        '  en-US | Hi.\n'
         '-----------------------------\n'
-        '  en_us | Goodbye.\n'
+        '  en-US | Goodbye.\n'
         '-----------------------------\n');
   });
 
   test("Add 2 translations in 2 languages.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "Hi.",
-          "pt_br": "Olá.",
+          "en-US": "Hi.",
+          "pt-BR": "Olá.",
         } +
         {
-          "en_us": "Goodbye.",
-          "pt_br": "Adeus.",
+          "en-US": "Goodbye.",
+          "pt-BR": "Adeus.",
         };
 
     expect(t.length, 2);
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hi.",
-        "pt_br": "Olá.",
+        "en-US": "Hi.",
+        "pt-BR": "Olá.",
       },
       "Goodbye.": {
-        "en_us": "Goodbye.",
-        "pt_br": "Adeus.",
+        "en-US": "Goodbye.",
+        "pt-BR": "Adeus.",
       }
     });
 
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi.\n'
-        '  pt_br | Olá.\n'
+        '  en-US | Hi.\n'
+        '  pt-BR | Olá.\n'
         '-----------------------------\n'
-        '  en_us | Goodbye.\n'
-        '  pt_br | Adeus.\n'
+        '  en-US | Goodbye.\n'
+        '  pt-BR | Adeus.\n'
         '-----------------------------\n');
   });
 
   test("Translations with versions.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "MyString".zero("Zero").one("One").two("Two").many("many"),
-          "pt_br": "MinhaString".zero("Zero").one("Um").two("Dois").many("Muitos"),
+          "en-US": "MyString".zero("Zero").one("One").two("Two").many("many"),
+          "pt-BR": "MinhaString".zero("Zero").one("Um").two("Dois").many("Muitos"),
         };
 
     expect(t.length, 1);
 
     expect(t.translationByLocale_ByTranslationKey, {
       "MyString": {
-        "en_us": "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
-        "pt_br":
+        "en-US": "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
+        "pt-BR":
             "\uFFFFMinhaString\uFFFF0\uFFFEZero\uFFFF1\uFFFEUm\uFFFF2\uFFFEDois\uFFFFM\uFFFEMuitos",
       },
     });
@@ -155,12 +155,12 @@ void main() {
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | MyString\n'
+        '  en-US | MyString\n'
         '          0 → Zero\n'
         '          1 → One\n'
         '          2 → Two\n'
         '          M → many\n'
-        '  pt_br | MinhaString\n'
+        '  pt-BR | MinhaString\n'
         '          0 → Zero\n'
         '          1 → Um\n'
         '          2 → Dois\n'
@@ -169,14 +169,14 @@ void main() {
   });
 
   test("Translations by locale with versions.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byLocale("en_us") +
+    var t = Translations.byLocale("en-US") +
         {
-          "en_us": {
+          "en-US": {
             "MyString": "MyString".zero("Zero").one("One").two("Two").many("many"),
           },
-          "pt_br": {
+          "pt-BR": {
             "MyString": "MinhaString".zero("Zero").one("Um").two("Dois").many("Muitos"),
           }
         };
@@ -185,8 +185,8 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "MyString": {
-        "en_us": "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
-        "pt_br":
+        "en-US": "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
+        "pt-BR":
             "\uFFFFMinhaString\uFFFF0\uFFFEZero\uFFFF1\uFFFEUm\uFFFF2\uFFFEDois\uFFFFM\uFFFEMuitos",
       },
     });
@@ -194,12 +194,12 @@ void main() {
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | MyString\n'
+        '  en-US | MyString\n'
         '          0 → Zero\n'
         '          1 → One\n'
         '          2 → Two\n'
         '          M → many\n'
-        '  pt_br | MinhaString\n'
+        '  pt-BR | MinhaString\n'
         '          0 → Zero\n'
         '          1 → Um\n'
         '          2 → Dois\n'
@@ -208,13 +208,13 @@ void main() {
   });
 
   test("Translations by locale with plurals.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
     String key = "You clicked the button %d times";
 
-    var t = Translations.byLocale("en_us") +
+    var t = Translations.byLocale("en-US") +
         {
-          "en_us": {
+          "en-US": {
             key: "You clicked the button %d times"
                 .zero("You haven't clicked the button")
                 .one("You clicked it once")
@@ -222,7 +222,7 @@ void main() {
                 .many("You clicked %d times")
                 .times(12, "You clicked a dozen times"),
           },
-          "pt_br": {
+          "pt-BR": {
             key: "Você clicou o botão %d vezes"
                 .zero("Você não clicou no botão")
                 .one("Você clicou uma única vez")
@@ -241,7 +241,7 @@ void main() {
     expect(plural(12), "You clicked a dozen times");
     expect(plural('12'), "You clicked a dozen times");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
 
     expect(plural(0), "Você não clicou no botão");
     expect(plural(1), "Você clicou uma única vez");
@@ -251,18 +251,18 @@ void main() {
   });
 
   test("Combine 2 translations.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t1 = Translations.byText("en_us") +
+    var t1 = Translations.byText("en-US") +
         {
-          "en_us": "Hi.",
-          "pt_br": "Olá.",
+          "en-US": "Hi.",
+          "pt-BR": "Olá.",
         };
 
-    var t2 = Translations.byText("en_us") +
+    var t2 = Translations.byText("en-US") +
         {
-          "en_us": "Goodbye.",
-          "pt_br": "Adeus.",
+          "en-US": "Goodbye.",
+          "pt-BR": "Adeus.",
         };
 
     var t = t1 * t2;
@@ -271,42 +271,42 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hi.",
-        "pt_br": "Olá.",
+        "en-US": "Hi.",
+        "pt-BR": "Olá.",
       },
       "Goodbye.": {
-        "en_us": "Goodbye.",
-        "pt_br": "Adeus.",
+        "en-US": "Goodbye.",
+        "pt-BR": "Adeus.",
       }
     });
 
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi.\n'
-        '  pt_br | Olá.\n'
+        '  en-US | Hi.\n'
+        '  pt-BR | Olá.\n'
         '-----------------------------\n'
-        '  en_us | Goodbye.\n'
-        '  pt_br | Adeus.\n'
+        '  en-US | Goodbye.\n'
+        '  pt-BR | Adeus.\n'
         '-----------------------------\n');
   });
 
   test("Add 2 translations in 3 languages, by locale.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byLocale("en_us") +
+    var t = Translations.byLocale("en-US") +
         {
-          "en_us": {
+          "en-US": {
             "Hi.": "Hi.",
             "Goodbye.": "Goodbye.",
           },
-          "es_es": {
+          "es-ES": {
             "Hi.": "Hola.",
             "Goodbye.": "Adiós.",
           }
         } +
         {
-          "pt_br": {
+          "pt-BR": {
             "Hi.": "Olá.",
             "Goodbye.": "Adeus.",
           }
@@ -316,43 +316,43 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hi.",
-        "es_es": "Hola.",
-        "pt_br": "Olá.",
+        "en-US": "Hi.",
+        "es-ES": "Hola.",
+        "pt-BR": "Olá.",
       },
       "Goodbye.": {
-        "en_us": "Goodbye.",
-        "es_es": "Adiós.",
-        "pt_br": "Adeus.",
+        "en-US": "Goodbye.",
+        "es-ES": "Adiós.",
+        "pt-BR": "Adeus.",
       }
     });
 
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi.\n'
-        '  es_es | Hola.\n'
-        '  pt_br | Olá.\n'
+        '  en-US | Hi.\n'
+        '  es-ES | Hola.\n'
+        '  pt-BR | Olá.\n'
         '-----------------------------\n'
-        '  en_us | Goodbye.\n'
-        '  es_es | Adiós.\n'
-        '  pt_br | Adeus.\n'
+        '  en-US | Goodbye.\n'
+        '  es-ES | Adiós.\n'
+        '  pt-BR | Adeus.\n'
         '-----------------------------\n');
   });
 
   test("Combine 2 translations, one of them by locale. Define both as `Translations`", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    Translations t1 = Translations.byText("en_us") +
+    Translations t1 = Translations.byText("en-US") +
         {
-          "cs_cz": "Ahoj.",
-          "en_us": "Hi.",
-          "pt_br": "Olá.",
+          "cs-CZ": "Ahoj.",
+          "en-US": "Hi.",
+          "pt-BR": "Olá.",
         };
 
-    Translations t2 = Translations.byLocale("en_us") +
+    Translations t2 = Translations.byLocale("en-US") +
         {
-          "pt_br": {
+          "pt-BR": {
             "Hi.": "Olá.",
             "Goodbye.": "Adeus.",
           }
@@ -366,12 +366,12 @@ void main() {
 
     expect(t12.translationByLocale_ByTranslationKey, {
       'Hi.': {
-        'cs_cz': 'Ahoj.',
-        'en_us': 'Hi.',
-        'pt_br': 'Olá.',
+        'cs-CZ': 'Ahoj.',
+        'en-US': 'Hi.',
+        'pt-BR': 'Olá.',
       },
       'Goodbye.': {
-        'pt_br': 'Adeus.',
+        'pt-BR': 'Adeus.',
       }
     });
 
@@ -383,34 +383,34 @@ void main() {
 
     expect(t21.translationByLocale_ByTranslationKey, {
       'Hi.': {
-        'cs_cz': 'Ahoj.',
-        'en_us': 'Hi.',
-        'pt_br': 'Olá.',
+        'cs-CZ': 'Ahoj.',
+        'en-US': 'Hi.',
+        'pt-BR': 'Olá.',
       },
       'Goodbye.': {
-        'pt_br': 'Adeus.',
+        'pt-BR': 'Adeus.',
       }
     });
   });
 
   test("Combine 2 translations by locale.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t1 = Translations.byLocale("en_us") +
+    var t1 = Translations.byLocale("en-US") +
         {
-          "en_us": {
+          "en-US": {
             "Hi.": "Hi.",
             "Goodbye.": "Goodbye.",
           },
-          "es_es": {
+          "es-ES": {
             "Hi.": "Hola.",
             "Goodbye.": "Adiós.",
           }
         };
 
-    Translations t2 = Translations.byLocale("en_us") +
+    Translations t2 = Translations.byLocale("en-US") +
         {
-          "pt_br": {
+          "pt-BR": {
             "Hi.": "Olá.",
             "Goodbye.": "Adeus.",
           }
@@ -422,42 +422,42 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hi.",
-        "es_es": "Hola.",
-        "pt_br": "Olá.",
+        "en-US": "Hi.",
+        "es-ES": "Hola.",
+        "pt-BR": "Olá.",
       },
       "Goodbye.": {
-        "en_us": "Goodbye.",
-        "es_es": "Adiós.",
-        "pt_br": "Adeus.",
+        "en-US": "Goodbye.",
+        "es-ES": "Adiós.",
+        "pt-BR": "Adeus.",
       }
     });
 
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hi.\n'
-        '  es_es | Hola.\n'
-        '  pt_br | Olá.\n'
+        '  en-US | Hi.\n'
+        '  es-ES | Hola.\n'
+        '  pt-BR | Olá.\n'
         '-----------------------------\n'
-        '  en_us | Goodbye.\n'
-        '  es_es | Adiós.\n'
-        '  pt_br | Adeus.\n'
+        '  en-US | Goodbye.\n'
+        '  es-ES | Adiós.\n'
+        '  pt-BR | Adeus.\n'
         '-----------------------------\n');
   });
 
   test("Keys can vary from the translations. Should return the value or key.", () {
-    var t = Translations.byLocale("en_us") +
+    var t = Translations.byLocale("en-US") +
         {
-          "en_us": {
+          "en-US": {
             "Hi.": "Hello.", // Different key/value for default language
             "Goodbye.": "Goodbye.",
           },
-          "es_es": {
+          "es-ES": {
             "Hi.": "Hola.",
             "Goodbye.": "Adiós.",
           },
-          "pt_br": {
+          "pt-BR": {
             // Hi is missing,
             "Goodbye.": "Adeus.",
           }
@@ -466,51 +466,51 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "Hi.": {
-        "en_us": "Hello.",
-        "es_es": "Hola.",
+        "en-US": "Hello.",
+        "es-ES": "Hola.",
       },
       "Goodbye.": {
-        "en_us": "Goodbye.",
-        "es_es": "Adiós.",
-        "pt_br": "Adeus.",
+        "en-US": "Goodbye.",
+        "es-ES": "Adiós.",
+        "pt-BR": "Adeus.",
       }
     });
 
     expect(
         t.toString(),
         '\nTranslations: ---------------\n'
-        '  en_us | Hello.\n'
-        '  es_es | Hola.\n'
+        '  en-US | Hello.\n'
+        '  es-ES | Hola.\n'
         '-----------------------------\n'
-        '  en_us | Goodbye.\n'
-        '  es_es | Adiós.\n'
-        '  pt_br | Adeus.\n'
+        '  en-US | Goodbye.\n'
+        '  es-ES | Adiós.\n'
+        '  pt-BR | Adeus.\n'
         '-----------------------------\n');
 
     // The translations should return the default value, rather than the key
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(localize('Hi.', t), "Hello.");
 
-    DefaultLocale.set("es_ES");
+    DefaultLocale.set("es-ES");
     expect(localize('Hi.', t), "Hola.");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(localize('Hi.', t), "Hello.");
   });
 
   test("Combine 2 translations, one of them by locale. Define both as `var`", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t1 = Translations.byText("en_us") +
+    var t1 = Translations.byText("en-US") +
         {
-          "cs_cz": "Ahoj.",
-          "en_us": "Hi.",
-          "pt_br": "Olá.",
+          "cs-CZ": "Ahoj.",
+          "en-US": "Hi.",
+          "pt-BR": "Olá.",
         };
 
-    var t2 = Translations.byLocale("en_us") +
+    var t2 = Translations.byLocale("en-US") +
         {
-          "pt_br": {
+          "pt-BR": {
             "Hi.": "Olá.",
             "Goodbye.": "Adeus.",
           }
@@ -524,12 +524,12 @@ void main() {
 
     expect(t12.translationByLocale_ByTranslationKey, {
       'Hi.': {
-        'cs_cz': 'Ahoj.',
-        'en_us': 'Hi.',
-        'pt_br': 'Olá.',
+        'cs-CZ': 'Ahoj.',
+        'en-US': 'Hi.',
+        'pt-BR': 'Olá.',
       },
       'Goodbye.': {
-        'pt_br': 'Adeus.',
+        'pt-BR': 'Adeus.',
       }
     });
 
@@ -541,45 +541,45 @@ void main() {
 
     expect(t21.translationByLocale_ByTranslationKey, {
       'Hi.': {
-        'cs_cz': 'Ahoj.',
-        'en_us': 'Hi.',
-        'pt_br': 'Olá.',
+        'cs-CZ': 'Ahoj.',
+        'en-US': 'Hi.',
+        'pt-BR': 'Olá.',
       },
       'Goodbye.': {
-        'pt_br': 'Adeus.',
+        'pt-BR': 'Adeus.',
       }
     });
   });
 
   test("Translate manually.", () {
     //
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "Hi.",
-          "pt_br": "Olá.",
+          "en-US": "Hi.",
+          "pt-BR": "Olá.",
         } +
         {
-          "en_us": "Goodbye.",
-          "pt_br": "Adeus.",
+          "en-US": "Goodbye.",
+          "pt-BR": "Adeus.",
         };
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(localize("Hi.", t), "Hi.");
     expect(localize("Goodbye", t), "Goodbye");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(localize("Hi.", t), "Olá.");
     expect(localize("Goodbye.", t), "Adeus.");
   });
 
   test("Translate using the extension.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect("Hi.".i18n, "Hi.");
     expect("Goodbye.".i18n, "Goodbye.");
     expect("XYZ".i18n, "XYZ");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect("Hi.".i18n, "Olá.");
     expect("Goodbye.".i18n, "Adeus.");
     expect("XYZ".i18n, "XYZ");
@@ -596,10 +596,10 @@ void main() {
     expect(Translations.missingKeys, isEmpty);
     expect(Translations.missingTranslations, isEmpty);
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect("Hi.".i18n, "Hi.");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect("Hi.".i18n, "Olá.");
 
     expect(Translations.missingKeys, isEmpty);
@@ -609,11 +609,11 @@ void main() {
 
     // 2) Search for a key which does NOT exist.
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect("Unknown text".i18n, "Unknown text");
 
     expect(Translations.missingKeys.length, 1);
-    expect(Translations.missingKeys.single.locale, "en_us");
+    expect(Translations.missingKeys.single.locale, "en-US");
     expect(Translations.missingKeys.single.key, "Unknown text");
     expect(Translations.missingTranslations, isEmpty);
 
@@ -628,7 +628,7 @@ void main() {
     expect("Hi.".i18n, "Hi.");
 
     expect(Translations.missingKeys, isEmpty);
-    expect(Translations.missingTranslations.single.locale, "xx_yy");
+    expect(Translations.missingTranslations.single.locale, "xx-YY");
     expect(Translations.missingTranslations.single.key, "Hi.");
   });
 
@@ -642,13 +642,13 @@ void main() {
     Translations.missingKeys.clear();
     Translations.missingTranslations.clear();
 
-    var t1 = Translations.byLocale("en_us") +
+    var t1 = Translations.byLocale("en-US") +
         {
-          "en_us": {"Hi.": "Hi."},
-          "es_es": {"Hi.": "Hola."}
+          "en-US": {"Hi.": "Hi."},
+          "es-ES": {"Hi.": "Hola."}
         };
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(localize("Hi.", t1), "Hi.");
 
     expect(Translations.missingKeys, isEmpty);
@@ -661,12 +661,12 @@ void main() {
     Translations.missingKeys.clear();
     Translations.missingTranslations.clear();
 
-    var t2 = Translations.byLocale("en_us") +
+    var t2 = Translations.byLocale("en-US") +
         {
-          "es_es": {"Hi.": "Hola."}
+          "es-ES": {"Hi.": "Hola."}
         };
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(localize("Hi.", t2), "Hi.");
 
     expect(Translations.missingKeys, isEmpty);
@@ -680,31 +680,31 @@ void main() {
     Translations.missingKeys.clear();
     Translations.missingTranslations.clear();
 
-    var t3 = Translations.byText("en_us") +
+    var t3 = Translations.byText("en-US") +
         {
-          "en_us": "Hi.",
-          "es_es": "Hola.",
+          "en-US": "Hi.",
+          "es-ES": "Hola.",
         };
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(localize("Hi.", t3), "Hi.");
 
     expect(Translations.missingKeys, isEmpty);
     expect(Translations.missingTranslations, isEmpty);
 
-    expect(() => Translations.byText("en_us") + {"es_es": "Hola."},
-        throwsA(TranslationsException("No default translation for 'en_us'.")));
+    expect(() => Translations.byText("en-US") + {"es-ES": "Hola."},
+        throwsA(TranslationsException("No default translation for 'en-US'.")));
 
     // ---------------
   });
 
   test("You must provide the translation in the default language.", () {
     //
-    expect(() => Translations.byText("en_us") + {"pt_br": "Olá."},
-        throwsA(TranslationsException("No default translation for 'en_us'.")));
+    expect(() => Translations.byText("en-US") + {"pt-BR": "Olá."},
+        throwsA(TranslationsException("No default translation for 'en-US'.")));
 
-    expect(() => Translations.byText("en_us") + {"pt_br": "Olá."},
-        throwsA(TranslationsException("No default translation for 'en_us'.")));
+    expect(() => Translations.byText("en-US") + {"pt-BR": "Olá."},
+        throwsA(TranslationsException("No default translation for 'en-US'.")));
   });
 
   test("Translations with version.", () {
@@ -742,7 +742,7 @@ void main() {
 
   test("Numeric modifiers.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var text = "There is 1 item.";
     expect(text.plural(0), "There are no items.");
     expect(text.plural(1), "There is 1 item.");
@@ -751,7 +751,7 @@ void main() {
     expect(text.plural(4), "There are 4 items.");
     expect(text.plural(5), "Yes, you reached 5 items.");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     text = "There is 1 item.";
     expect(text.plural(0), "Não há itens.");
     expect(text.plural(1), "Há 1 item.");
@@ -763,7 +763,7 @@ void main() {
 
   test("Custom modifiers.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var text = "There is a person";
     expect(text.gender(Gender.male), "There is a man");
     expect(text.gender(Gender.female), "There is a woman");
@@ -772,11 +772,11 @@ void main() {
     expect(
         () => text.gender(Gender.x),
         throwsA(TranslationsException(
-            "This text has no version for modifier 'Gender.x' (modifier: Gender.x, key: 'There is a person', locale: 'en_us').")));
+            "This text has no version for modifier 'Gender.x' (modifier: Gender.x, key: 'There is a person', locale: 'en-US').")));
 
     // ---
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     text = "There is a person";
     expect(text.gender(Gender.male), "Há um homem");
     expect(text.gender(Gender.female), "Há uma mulher");
@@ -785,15 +785,15 @@ void main() {
     expect(
         () => text.gender(Gender.x),
         throwsA(TranslationsException(
-            "This text has no version for modifier 'Gender.x' (modifier: Gender.x, key: 'There is a person', locale: 'pt_br').")));
+            "This text has no version for modifier 'Gender.x' (modifier: Gender.x, key: 'There is a person', locale: 'pt-BR').")));
   });
 
   test("Czech variations.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "1 beer"
+          "en-US": "1 beer"
               .zero("0 beers")
               .one("1 beer")
               .two("2 beers")
@@ -804,7 +804,7 @@ void main() {
               .ten("10 beers")
               .times(12, "12 beers")
               .many("many beers"),
-          "cz_cz": "1 variation"
+          "cz-CZ": "1 variation"
               .zero("0 variation")
               .one("1 variation")
               .two("2 variation")
@@ -820,29 +820,29 @@ void main() {
               .many("many variation"),
         };
 
-    DefaultLocale.set("cz_cz");
+    DefaultLocale.set("cz-CZ");
     var key = "1 beer";
-    expect(localizePlural(0, key, t, locale: "cz_cz"), "0 variation");
-    expect(localizePlural(1, key, t, locale: "cz_cz"), "1 variation");
-    expect(localizePlural(2, key, t, locale: "cz_cz"), "2 variation");
-    expect(localizePlural(3, key, t, locale: "cz_cz"), "3 variation");
-    expect(localizePlural(4, key, t, locale: "cz_cz"), "4 variation");
-    expect(localizePlural(5, key, t, locale: "cz_cz"), "5 variation");
-    expect(localizePlural(6, key, t, locale: "cz_cz"), "6 variation");
-    expect(localizePlural(7, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(8, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(9, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(10, key, t, locale: "cz_cz"), "10 variation");
-    expect(localizePlural(11, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(12, key, t, locale: "cz_cz"), "times variation");
-    expect(localizePlural(13, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(14, key, t, locale: "cz_cz"), "many variation");
+    expect(localizePlural(0, key, t, locale: "cz-CZ"), "0 variation");
+    expect(localizePlural(1, key, t, locale: "cz-CZ"), "1 variation");
+    expect(localizePlural(2, key, t, locale: "cz-CZ"), "2 variation");
+    expect(localizePlural(3, key, t, locale: "cz-CZ"), "3 variation");
+    expect(localizePlural(4, key, t, locale: "cz-CZ"), "4 variation");
+    expect(localizePlural(5, key, t, locale: "cz-CZ"), "5 variation");
+    expect(localizePlural(6, key, t, locale: "cz-CZ"), "6 variation");
+    expect(localizePlural(7, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(8, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(9, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(10, key, t, locale: "cz-CZ"), "10 variation");
+    expect(localizePlural(11, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(12, key, t, locale: "cz-CZ"), "times variation");
+    expect(localizePlural(13, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(14, key, t, locale: "cz-CZ"), "many variation");
 
     expect(
         t.toString(),
         '\n'
         'Translations: ---------------\n'
-        '  en_us | 1 beer\n'
+        '  en-US | 1 beer\n'
         '          0 → 0 beers\n'
         '          1 → 1 beer\n'
         '          2 → 2 beers\n'
@@ -853,7 +853,7 @@ void main() {
         '          T → 10 beers\n'
         '          12 → 12 beers\n'
         '          M → many beers\n'
-        '  cz_cz | 1 variation\n'
+        '  cz-CZ | 1 variation\n'
         '          0 → 0 variation\n'
         '          1 → 1 variation\n'
         '          2 → 2 variation\n'
@@ -868,9 +868,9 @@ void main() {
         '-----------------------------\n');
 
     // Now try again without defining .two .three .four.
-    t = Translations.byText("en_us") +
+    t = Translations.byText("en-US") +
         {
-          "en_us": "1 beer"
+          "en-US": "1 beer"
               .zero("0 beers")
               .one("1 beer")
               .five("5 beers")
@@ -878,7 +878,7 @@ void main() {
               .ten("10 beers")
               .times(12, "12 beers")
               .many("many beers"),
-          "cz_cz": "1 variation"
+          "cz-CZ": "1 variation"
               .zero("0 variation")
               .one("1 variation")
               // .twoThreeFour will  be used.
@@ -890,32 +890,32 @@ void main() {
               .many("many variation"),
         };
 
-    expect(localizePlural(0, key, t, locale: "cz_cz"), "0 variation");
-    expect(localizePlural(1, key, t, locale: "cz_cz"), "1 variation");
-    expect(localizePlural(2, key, t, locale: "cz_cz"), "234 variation");
-    expect(localizePlural(3, key, t, locale: "cz_cz"), "234 variation");
-    expect(localizePlural(4, key, t, locale: "cz_cz"), "234 variation");
-    expect(localizePlural(5, key, t, locale: "cz_cz"), "5 variation");
-    expect(localizePlural(6, key, t, locale: "cz_cz"), "6 variation");
-    expect(localizePlural(7, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(8, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(9, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(10, key, t, locale: "cz_cz"), "10 variation");
-    expect(localizePlural(11, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(12, key, t, locale: "cz_cz"), "times variation");
-    expect(localizePlural(13, key, t, locale: "cz_cz"), "many variation");
-    expect(localizePlural(14, key, t, locale: "cz_cz"), "many variation");
+    expect(localizePlural(0, key, t, locale: "cz-CZ"), "0 variation");
+    expect(localizePlural(1, key, t, locale: "cz-CZ"), "1 variation");
+    expect(localizePlural(2, key, t, locale: "cz-CZ"), "234 variation");
+    expect(localizePlural(3, key, t, locale: "cz-CZ"), "234 variation");
+    expect(localizePlural(4, key, t, locale: "cz-CZ"), "234 variation");
+    expect(localizePlural(5, key, t, locale: "cz-CZ"), "5 variation");
+    expect(localizePlural(6, key, t, locale: "cz-CZ"), "6 variation");
+    expect(localizePlural(7, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(8, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(9, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(10, key, t, locale: "cz-CZ"), "10 variation");
+    expect(localizePlural(11, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(12, key, t, locale: "cz-CZ"), "times variation");
+    expect(localizePlural(13, key, t, locale: "cz-CZ"), "many variation");
+    expect(localizePlural(14, key, t, locale: "cz-CZ"), "many variation");
   });
 
   test("0 and 1 plural.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var key = "1 beer";
 
     // ---
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "1 beer"
+          "en-US": "1 beer"
               .zeroOne("0 or 1 beers")
               .zero("0 beers")
               .one("1 beer")
@@ -925,31 +925,31 @@ void main() {
         };
 
     // .zero and .one have priority over .zeroOne, because they are more specific.
-    expect(localizePlural(0, key, t, locale: "en_us"), "0 beers");
-    expect(localizePlural(1, key, t, locale: "en_us"), "1 beer");
-    expect(localizePlural(2, key, t, locale: "en_us"), "2 beers");
-    expect(localizePlural(3, key, t, locale: "en_us"), "3 beers");
-    expect(localizePlural(4, key, t, locale: "en_us"), "many beers");
+    expect(localizePlural(0, key, t, locale: "en-US"), "0 beers");
+    expect(localizePlural(1, key, t, locale: "en-US"), "1 beer");
+    expect(localizePlural(2, key, t, locale: "en-US"), "2 beers");
+    expect(localizePlural(3, key, t, locale: "en-US"), "3 beers");
+    expect(localizePlural(4, key, t, locale: "en-US"), "many beers");
 
     // ---
 
-    t = Translations.byText("en_us") +
+    t = Translations.byText("en-US") +
         {
-          "en_us":
+          "en-US":
               "1 beer".zeroOne("0 or 1 beers").two("2 beers").three("3 beers").many("many beers"),
         };
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "0 or 1 beers");
-    expect(localizePlural(1, key, t, locale: "en_us"), "0 or 1 beers");
-    expect(localizePlural(2, key, t, locale: "en_us"), "2 beers");
-    expect(localizePlural(3, key, t, locale: "en_us"), "3 beers");
-    expect(localizePlural(4, key, t, locale: "en_us"), "many beers");
+    expect(localizePlural(0, key, t, locale: "en-US"), "0 or 1 beers");
+    expect(localizePlural(1, key, t, locale: "en-US"), "0 or 1 beers");
+    expect(localizePlural(2, key, t, locale: "en-US"), "2 beers");
+    expect(localizePlural(3, key, t, locale: "en-US"), "3 beers");
+    expect(localizePlural(4, key, t, locale: "en-US"), "many beers");
 
     expect(
         t.toString(),
         '\n'
         'Translations: ---------------\n'
-        '  en_us | 1 beer\n'
+        '  en-US | 1 beer\n'
         '          F → 0 or 1 beers\n'
         '          2 → 2 beers\n'
         '          3 → 3 beers\n'
@@ -958,14 +958,14 @@ void main() {
   });
 
   test("1 or more plural.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var key = "1 beer";
 
     // ---
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "1 beer"
+          "en-US": "1 beer"
               .oneOrMore("1 or more beers")
               .zero("0 beers")
               .one("1 beer")
@@ -975,28 +975,28 @@ void main() {
         };
 
     // .one, .two, .three, .many have priority over .oneMany, because they are more specific.
-    expect(localizePlural(0, key, t, locale: "en_us"), "0 beers");
-    expect(localizePlural(1, key, t, locale: "en_us"), "1 beer");
-    expect(localizePlural(2, key, t, locale: "en_us"), "2 beers");
-    expect(localizePlural(3, key, t, locale: "en_us"), "3 beers");
-    expect(localizePlural(4, key, t, locale: "en_us"), "many beers");
+    expect(localizePlural(0, key, t, locale: "en-US"), "0 beers");
+    expect(localizePlural(1, key, t, locale: "en-US"), "1 beer");
+    expect(localizePlural(2, key, t, locale: "en-US"), "2 beers");
+    expect(localizePlural(3, key, t, locale: "en-US"), "3 beers");
+    expect(localizePlural(4, key, t, locale: "en-US"), "many beers");
 
     // ---
 
-    t = Translations.byText("en_us") +
-        {"en_us": "1 beer".oneOrMore("1 or more beers").zero("0 beers").three("3 beers")};
+    t = Translations.byText("en-US") +
+        {"en-US": "1 beer".oneOrMore("1 or more beers").zero("0 beers").three("3 beers")};
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "0 beers");
-    expect(localizePlural(1, key, t, locale: "en_us"), "1 or more beers");
-    expect(localizePlural(2, key, t, locale: "en_us"), "1 or more beers");
-    expect(localizePlural(3, key, t, locale: "en_us"), "3 beers");
-    expect(localizePlural(4, key, t, locale: "en_us"), "1 or more beers");
+    expect(localizePlural(0, key, t, locale: "en-US"), "0 beers");
+    expect(localizePlural(1, key, t, locale: "en-US"), "1 or more beers");
+    expect(localizePlural(2, key, t, locale: "en-US"), "1 or more beers");
+    expect(localizePlural(3, key, t, locale: "en-US"), "3 beers");
+    expect(localizePlural(4, key, t, locale: "en-US"), "1 or more beers");
 
     expect(
         t.toString(),
         '\n'
         'Translations: ---------------\n'
-        '  en_us | 1 beer\n'
+        '  en-US | 1 beer\n'
         '          R → 1 or more beers\n'
         '          0 → 0 beers\n'
         '          3 → 3 beers\n'
@@ -1005,92 +1005,92 @@ void main() {
 
   test("Comparison between .oneOrMore and .many.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var key = "1 beer";
 
     // Make sure "1 or more" DOES NOT include zero (but includes 1).
-    var t = Translations.byText("en_us") + {"en_us": "1 beer".oneOrMore("1 or more beer")};
+    var t = Translations.byText("en-US") + {"en-US": "1 beer".oneOrMore("1 or more beer")};
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "1 beer");
-    expect(localizePlural(1, key, t, locale: "en_us"), "1 or more beer");
-    expect(localizePlural(2, key, t, locale: "en_us"), "1 or more beer");
-    expect(localizePlural(3, key, t, locale: "en_us"), "1 or more beer");
-    expect(localizePlural(4, key, t, locale: "en_us"), "1 or more beer");
+    expect(localizePlural(0, key, t, locale: "en-US"), "1 beer");
+    expect(localizePlural(1, key, t, locale: "en-US"), "1 or more beer");
+    expect(localizePlural(2, key, t, locale: "en-US"), "1 or more beer");
+    expect(localizePlural(3, key, t, locale: "en-US"), "1 or more beer");
+    expect(localizePlural(4, key, t, locale: "en-US"), "1 or more beer");
 
     // While "many" DOES INCLUDE zero (but not one).
-    t = Translations.byText("en_us") + {"en_us": "1 beer".many("many beers")};
+    t = Translations.byText("en-US") + {"en-US": "1 beer".many("many beers")};
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "many beers");
-    expect(localizePlural(1, key, t, locale: "en_us"), "1 beer");
-    expect(localizePlural(2, key, t, locale: "en_us"), "many beers");
-    expect(localizePlural(3, key, t, locale: "en_us"), "many beers");
-    expect(localizePlural(4, key, t, locale: "en_us"), "many beers");
+    expect(localizePlural(0, key, t, locale: "en-US"), "many beers");
+    expect(localizePlural(1, key, t, locale: "en-US"), "1 beer");
+    expect(localizePlural(2, key, t, locale: "en-US"), "many beers");
+    expect(localizePlural(3, key, t, locale: "en-US"), "many beers");
+    expect(localizePlural(4, key, t, locale: "en-US"), "many beers");
   });
 
   test("Empty strings are allowed.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var key = "1 beer";
 
     var t =
-        Translations.byText("en_us") + {"en_us": "1 beer".zero("").three("").many("many beers")};
+        Translations.byText("en-US") + {"en-US": "1 beer".zero("").three("").many("many beers")};
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "");
-    expect(localizePlural(1, key, t, locale: "en_us"), "1 beer");
-    expect(localizePlural(2, key, t, locale: "en_us"), "many beers");
-    expect(localizePlural(3, key, t, locale: "en_us"), "");
-    expect(localizePlural(4, key, t, locale: "en_us"), "many beers");
+    expect(localizePlural(0, key, t, locale: "en-US"), "");
+    expect(localizePlural(1, key, t, locale: "en-US"), "1 beer");
+    expect(localizePlural(2, key, t, locale: "en-US"), "many beers");
+    expect(localizePlural(3, key, t, locale: "en-US"), "");
+    expect(localizePlural(4, key, t, locale: "en-US"), "many beers");
   });
 
   test("Plurals not provided default to the unversioned string.", () {
     //
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     var key = "unversioned";
 
     // ---
 
-    var t = Translations.byText("en_us") +
+    var t = Translations.byText("en-US") +
         {
-          "en_us": "unversioned".zero("version 0").many("version many"),
-          "pt_br": "não versionada".zero("versão 0").many("versão várias"),
+          "en-US": "unversioned".zero("version 0").many("version many"),
+          "pt-BR": "não versionada".zero("versão 0").many("versão várias"),
         };
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "version 0");
-    expect(localizePlural(1, key, t, locale: "en_us"), "unversioned");
-    expect(localizePlural(2, key, t, locale: "en_us"), "version many");
-    expect(localizePlural(3, key, t, locale: "en_us"), "version many");
+    expect(localizePlural(0, key, t, locale: "en-US"), "version 0");
+    expect(localizePlural(1, key, t, locale: "en-US"), "unversioned");
+    expect(localizePlural(2, key, t, locale: "en-US"), "version many");
+    expect(localizePlural(3, key, t, locale: "en-US"), "version many");
 
-    expect(localizePlural(0, key, t, locale: "pt_br"), "versão 0");
-    expect(localizePlural(1, key, t, locale: "pt_br"), "não versionada");
-    expect(localizePlural(2, key, t, locale: "pt_br"), "versão várias");
-    expect(localizePlural(3, key, t, locale: "pt_br"), "versão várias");
+    expect(localizePlural(0, key, t, locale: "pt-BR"), "versão 0");
+    expect(localizePlural(1, key, t, locale: "pt-BR"), "não versionada");
+    expect(localizePlural(2, key, t, locale: "pt-BR"), "versão várias");
+    expect(localizePlural(3, key, t, locale: "pt-BR"), "versão várias");
 
     // ---
 
-    t = Translations.byText("en_us") +
+    t = Translations.byText("en-US") +
         {
-          "en_us": "unversioned".zero("version 0").many("version many"),
-          "pt_br": "não versionada",
+          "en-US": "unversioned".zero("version 0").many("version many"),
+          "pt-BR": "não versionada",
         };
 
-    expect(localizePlural(0, key, t, locale: "en_us"), "version 0");
-    expect(localizePlural(1, key, t, locale: "en_us"), "unversioned");
-    expect(localizePlural(2, key, t, locale: "en_us"), "version many");
-    expect(localizePlural(3, key, t, locale: "en_us"), "version many");
+    expect(localizePlural(0, key, t, locale: "en-US"), "version 0");
+    expect(localizePlural(1, key, t, locale: "en-US"), "unversioned");
+    expect(localizePlural(2, key, t, locale: "en-US"), "version many");
+    expect(localizePlural(3, key, t, locale: "en-US"), "version many");
 
-    expect(localizePlural(0, key, t, locale: "pt_br"), "não versionada");
-    expect(localizePlural(1, key, t, locale: "pt_br"), "não versionada");
-    expect(localizePlural(2, key, t, locale: "pt_br"), "não versionada");
-    expect(localizePlural(3, key, t, locale: "pt_br"), "não versionada");
+    expect(localizePlural(0, key, t, locale: "pt-BR"), "não versionada");
+    expect(localizePlural(1, key, t, locale: "pt-BR"), "não versionada");
+    expect(localizePlural(2, key, t, locale: "pt-BR"), "não versionada");
+    expect(localizePlural(3, key, t, locale: "pt-BR"), "não versionada");
 
     expect(
         t.toString(),
         '\n'
         'Translations: ---------------\n'
-        '  en_us | unversioned\n'
+        '  en-US | unversioned\n'
         '          0 → version 0\n'
         '          M → version many\n'
-        '  pt_br | não versionada\n'
+        '  pt-BR | não versionada\n'
         '-----------------------------\n');
   });
 
@@ -1166,29 +1166,29 @@ void main() {
 
 extension Localization on String {
   //
-  static final _t = Translations.byText("en_us") +
+  static final _t = Translations.byText("en-US") +
       {
-        "en_us": "Hi.",
-        "cs_cz": "Zdravím tě",
-        "en_uk": "Hi.",
-        "pt_br": "Olá.",
+        "en-US": "Hi.",
+        "cs-CZ": "Zdravím tě",
+        "en-UK": "Hi.",
+        "pt-BR": "Olá.",
         "es": "Hola.",
       } +
       {
-        "en_us": "Goodbye.",
-        "pt_br": "Adeus.",
-        "cs_cz": "Sbohem.",
-        "en_uk": "Goodbye.",
+        "en-US": "Goodbye.",
+        "pt-BR": "Adeus.",
+        "cs-CZ": "Sbohem.",
+        "en-UK": "Goodbye.",
         "es": "Adiós.",
       } +
       {
-        "en_us": "There is 1 item."
+        "en-US": "There is 1 item."
             .zero("There are no items.")
             .one("There is 1 item.")
             .two("There are a pair of items.")
             .times(5, "Yes, you reached 5 items.")
             .many("There are %d items."),
-        "pt_br": "Há 1 item."
+        "pt-BR": "Há 1 item."
             .zero("Não há itens.")
             .one("Há 1 item.")
             .two("Há um par de itens.")
@@ -1196,11 +1196,11 @@ extension Localization on String {
             .many("Há %d itens."),
       } +
       {
-        "en_us": "There is a person"
+        "en-US": "There is a person"
             .modifier(Gender.male, "There is a man")
             .modifier(Gender.female, "There is a woman")
             .modifier(Gender.they, "There is a person"),
-        "pt_br": "Há uma pessoa"
+        "pt-BR": "Há uma pessoa"
             .modifier(Gender.male, "Há um homem")
             .modifier(Gender.female, "Há uma mulher")
             .modifier(Gender.they, "Há uma pessoa"),

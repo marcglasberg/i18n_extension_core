@@ -1,8 +1,10 @@
-## 2.0.7
-
-* Sponsored by [MyText.ai](https://mytext.ai)
+Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+
+## 3.0.0
+
+* DOCUMENT!!!
 
 ## 2.0.6
 

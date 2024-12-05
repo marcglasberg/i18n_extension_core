@@ -16,29 +16,29 @@ import 'utils.dart';
 /// ```dart
 /// enum MyColors { red, green }
 ///
-/// var t = Translations.byId<MyTranslations>("en_us", {
+/// var t = Translations.byId<MyTranslations>("en-US", {
 ///              MyColors.red: {
-///                  "en_us": "red",
-///                  "pt_br": "vermelho",
+///                  "en-US": "red",
+///                  "pt-BR": "vermelho",
 ///              },
 ///              MyColors.green: {
-///                  "en_us": "green",
-///                  "pt_br": "Verde",
+///                  "en-US": "green",
+///                  "pt-BR": "Verde",
 ///              });
 /// ```
 ///
 /// Note you may also add translations with the [+] operator. For example:
 ///
 /// ```
-/// var t = Translations.byId<MyTranslations>("en_us", {
+/// var t = Translations.byId<MyTranslations>("en-US", {
 ///              MyColors.red: {
-///                  "en_us": "red",
-///                  "pt_br": "vermelho",
+///                  "en-US": "red",
+///                  "pt-BR": "vermelho",
 ///              }) +
 ///              {
 ///                  MyColors.green: {
-///                     "en_us": "green",
-///                     "pt_br": "Verde",
+///                     "en-US": "green",
+///                     "pt-BR": "Verde",
 ///                  }
 ///              };
 /// ```
@@ -47,18 +47,18 @@ import 'utils.dart';
 /// or even `Object?` (or `dynamic`). For example:
 ///
 /// ```
-/// var t = Translations.byId<Object?>("en_us", {
+/// var t = Translations.byId<Object?>("en-US", {
 ///              MyColors.red: {
-///                  "en_us": "red",
-///                  "pt_br": "vermelho",
+///                  "en-US": "red",
+///                  "pt-BR": "vermelho",
 ///              },
 ///              123: {
-///                  "en_us": "One two three",
-///                  "pt_br": "Um dois três",
+///                  "en-US": "One two three",
+///                  "pt-BR": "Um dois três",
 ///              },
 ///              null: {
-///                  "en_us": "This is empty",
-///                  "pt_br": "Isso está vazio",
+///                  "en-US": "This is empty",
+///                  "pt-BR": "Isso está vazio",
 ///              });
 /// ```
 ///
@@ -91,29 +91,29 @@ class TranslationsByIdentifier< //
   /// ```dart
   /// enum MyColors { red, green }
   ///
-  /// var t = Translations.byId<MyTranslations>("en_us", {
+  /// var t = Translations.byId<MyTranslations>("en-US", {
   ///              MyColors.red: {
-  ///                  "en_us": "red",
-  ///                  "pt_br": "vermelho",
+  ///                  "en-US": "red",
+  ///                  "pt-BR": "vermelho",
   ///              },
   ///              MyColors.green: {
-  ///                  "en_us": "green",
-  ///                  "pt_br": "Verde",
+  ///                  "en-US": "green",
+  ///                  "pt-BR": "Verde",
   ///              });
   /// ```
   ///
   /// Note you may also add translations with the [+] operator. For example:
   ///
   /// ```
-  /// var t = Translations.byId<MyTranslations>("en_us", {
+  /// var t = Translations.byId<MyTranslations>("en-US", {
   ///              MyColors.red: {
-  ///                  "en_us": "red",
-  ///                  "pt_br": "vermelho",
+  ///                  "en-US": "red",
+  ///                  "pt-BR": "vermelho",
   ///              }) +
   ///              {
   ///                  MyColors.green: {
-  ///                     "en_us": "green",
-  ///                     "pt_br": "Verde",
+  ///                     "en-US": "green",
+  ///                     "pt-BR": "Verde",
   ///                  }
   ///              };
   /// ```
@@ -122,18 +122,18 @@ class TranslationsByIdentifier< //
   /// or even `Object?` (or `dynamic`). For example:
   ///
   /// ```
-  /// var t = Translations.byId<Object?>("en_us", {
+  /// var t = Translations.byId<Object?>("en-US", {
   ///              MyColors.red: {
-  ///                  "en_us": "red",
-  ///                  "pt_br": "vermelho",
+  ///                  "en-US": "red",
+  ///                  "pt-BR": "vermelho",
   ///              },
   ///              123: {
-  ///                  "en_us": "One two three",
-  ///                  "pt_br": "Um dois três",
+  ///                  "en-US": "One two three",
+  ///                  "pt-BR": "Um dois três",
   ///              },
   ///              null: {
-  ///                  "en_us": "This is empty",
-  ///                  "pt_br": "Isso está vazio",
+  ///                  "en-US": "This is empty",
+  ///                  "pt-BR": "Isso está vazio",
   ///              });
   /// ```
   ///
@@ -145,7 +145,7 @@ class TranslationsByIdentifier< //
     String defaultLocaleStr,
     Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey,
   ) : super.gen(
-          defaultLocaleStr: normalizeLocale(defaultLocaleStr),
+          defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: translationByLocale_ByTranslationKey,
         );
 
@@ -166,9 +166,9 @@ class TranslationsByIdentifier< //
   /// Adds a Map [addedMap] of translations to a [Translations] object. Example:
   ///
   /// ```dart
-  /// var t = Translations.byId("en_us") +
-  ///         {123 : {"en_us": "Hi", "pt_br": "Olá" }} + // addedMap
-  ///         {456 : {"en_us": "Goodbye", "pt_br": "Adeus"}}; // Another addedMap
+  /// var t = Translations.byId("en-US") +
+  ///         {123 : {"en-US": "Hi", "pt-BR": "Olá" }} + // addedMap
+  ///         {456 : {"en-US": "Goodbye", "pt-BR": "Adeus"}}; // Another addedMap
   /// ```
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator +(ADDEDMAP addedMap) {
@@ -187,11 +187,11 @@ class TranslationsByIdentifier< //
   /// Example:
   ///
   /// ```
-  /// var t1 = Translations.byId("en_us") + {"en_us": "Hi.", "pt_br": "Olá."};
-  /// var t2 = Translations.byId("en_us") + {"en_us": "Goodbye.", "pt_br": "Adeus."};
+  /// var t1 = Translations.byId("en-US") + {"en-US": "Hi.", "pt-BR": "Olá."};
+  /// var t2 = Translations.byId("en-US") + {"en-US": "Goodbye.", "pt-BR": "Adeus."};
   ///
   /// var translations = t1 * t2;
-  /// print(localize("Hi.", translations, locale: "pt_br");
+  /// print(localize("Hi.", translations, locale: "pt-BR");
   ///
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(

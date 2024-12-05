@@ -1,225 +1,228 @@
 import 'package:i18n_extension_core/src/core_localize_functions.dart';
 import 'package:i18n_extension_core/src/translations.dart';
+import 'package:i18n_extension_core/src/translations_exception.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test(
-      "If the translation to the exact locale is found, this will be returned. "
-      "Otherwise, it tries to return a translation for the general language of the locale. "
-      "Otherwise, it tries to return a translation for any locale with that language. "
-      "Otherwise, it tries to return the key itself (which is the translation for the default locale).",
-      () {
-    // Translations exist for "en_us": ----------------
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("en_US");
-    expect("Mobile phone".i18n_1, "Mobile phone");
-
-    // There's NO exact translation, and NO general translation.
-    // So uses any other translation in "en".
-    DefaultLocale.set("en_UK");
-    expect("Mobile phone".i18n_1, "Mobile phone");
-
-    // There's NO general "en" translation, so uses any other translation in "en".
-    DefaultLocale.set("en");
-    expect("Mobile phone".i18n_1, "Mobile phone");
-
-    // Ignores ending with "_".
-    DefaultLocale.set("en_us_");
-    expect("Mobile phone".i18n_1, "Mobile phone");
-
-    // Translations exist for "pt_br" and "pt_pt": ----------------
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("pt_BR");
-    expect("Mobile phone".i18n_1, "Celular");
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("pt_PT");
-    expect("Mobile phone".i18n_1, "Telemóvel");
-
-    // There's NO exact translation, and NO general translation.
-    // So uses any other translation in "pt".
-    DefaultLocale.set("pt_MO");
-    expect("Mobile phone".i18n_1, "Celular");
-
-    // There's NO general "pt" translation, so uses any other translation in "pt".
-    DefaultLocale.set("pt");
-    expect("Mobile phone".i18n_1, "Celular");
-
-    // There's NO translation at all in this language.
-    DefaultLocale.set("xx");
-    expect("Mobile phone".i18n_1, "Mobile phone");
-
-    // There's NO translation at all in this locale.
-    DefaultLocale.set("xx_yy");
-    expect("Mobile phone".i18n_1, "Mobile phone");
-
-    // Translations exist for "pt_br" and "pt": ----------------
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("pt_BR");
-    expect("Address".i18n_1, "Endereço");
-
-    // There's NO exact translation,
-    // So uses the GENERAL translation in "pt".
-    DefaultLocale.set("pt_PT");
-    expect("Address".i18n_1, "Morada");
-
-    // There's the exact GENERAL translation in "pt".
-    DefaultLocale.set("pt");
-    expect("Address".i18n_1, "Morada");
-
-    // There's NO translation at all in this language.
-    DefaultLocale.set("xx");
-    expect("Address".i18n_1, "Address");
-
-    // There's NO translation at all in this locale.
-    DefaultLocale.set("xx_yy");
-    expect("Address".i18n_1, "Address");
-
-    // Ignores ending with "_".
-    DefaultLocale.set("pt_");
-    expect("Address".i18n_1, "Morada");
-  });
-
-  test(
-      "If the translation to the exact locale is found, this will be returned. "
-      "Otherwise, it tries to return a translation for the general language of the locale. "
-      "Otherwise, it tries to return a translation for any locale with that language. "
-      "Otherwise, it tries to return the key itself (which is the translation for the default locale).",
-      () {
-    // Translations exist for "en": ----------------
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("en");
-    expect("Mobile phone".i18n_2, "Mobile phone");
-
-    // There's NO exact translation, so uses general "en".
-    DefaultLocale.set("en_US");
-    expect("Mobile phone".i18n_2, "Mobile phone");
-
-    // Ignores country with "_".
-    DefaultLocale.set("en__us");
-    expect("Mobile phone".i18n_2, "Mobile phone");
-
-    // Translations exist for "pt_br" and "pt_pt": ----------------
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("pt_BR");
-    expect("Mobile phone".i18n_2, "Celular");
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("pt_PT");
-    expect("Mobile phone".i18n_2, "Telemóvel");
-
-    // There's NO exact translation, and NO general translation.
-    // So uses any other translation in "pt".
-    DefaultLocale.set("pt_MO");
-    expect("Mobile phone".i18n_2, "Celular");
-
-    // There's NO general "pt" translation, so uses any other translation in "pt".
-    DefaultLocale.set("pt");
-    expect("Mobile phone".i18n_2, "Celular");
-
-    // There's NO translation at all in this language.
-    DefaultLocale.set("xx");
-    expect("Mobile phone".i18n_2, "Mobile phone");
-
-    // There's NO translation at all in this locale.
-    DefaultLocale.set("xx_YY");
-    expect("Mobile phone".i18n_2, "Mobile phone");
-
-    // Ignores country with "_".
-    DefaultLocale.set("pt__BR");
-    expect("Mobile phone".i18n_2, "Celular");
-
-    // Translations exist for "pt_br" and "pt": ----------------
-
-    // There's an EXACT translation for this exact locale.
-    DefaultLocale.set("pt_BR");
-    expect("Address".i18n_2, "Endereço");
-
-    // There's NO exact translation,
-    // So uses the GENERAL translation in "pt".
-    DefaultLocale.set("pt_PT");
-    expect("Address".i18n_2, "Morada");
-
-    // There's the exact GENERAL translation in "pt".
-    DefaultLocale.set("pt");
-    expect("Address".i18n_2, "Morada");
-
-    // There's NO translation at all in this language.
-    DefaultLocale.set("xx");
-    expect("Address".i18n_2, "Address");
-
-    // There's NO translation at all in this locale.
-    DefaultLocale.set("xx_YY");
-    expect("Address".i18n_2, "Address");
-  });
-
-  test("Ignores spaces or underscore.", () {
-    expect(Translations.byText("en_").defaultLocaleStr, "en");
-    expect(Translations.byText("en ").defaultLocaleStr, "en");
-    expect(Translations.byText(" en ").defaultLocaleStr, "en");
-    expect(Translations.byText(" en_ ").defaultLocaleStr, "en");
-    expect(Translations.byText(" en___ ").defaultLocaleStr, "en");
-    expect(Translations.byText(" en_us_ ").defaultLocaleStr, "en_us");
-
-    expect(Translations.byText("en_").defaultLanguageStr, "en");
-    expect(Translations.byText("en ").defaultLanguageStr, "en");
-    expect(Translations.byText(" en ").defaultLanguageStr, "en");
-    expect(Translations.byText(" en_ ").defaultLanguageStr, "en");
-    expect(Translations.byText(" en___ ").defaultLanguageStr, "en");
-    expect(Translations.byText(" en_us_ ").defaultLanguageStr, "en");
-
-    DefaultLocale.set("en");
-    expect(DefaultLocale.locale, "en");
-
-    DefaultLocale.set("en__");
-    expect(DefaultLocale.locale, "en");
-
-    DefaultLocale.set("en_US");
-    expect(DefaultLocale.locale, "en_us");
-
-    DefaultLocale.set("en_US");
-    expect(DefaultLocale.locale, "en_us");
-
-    DefaultLocale.set("en_us");
-    expect(DefaultLocale.locale, "en_us");
-
-    DefaultLocale.set("en_us _ ");
-    expect(DefaultLocale.locale, "en_us");
-  });
-}
-
-extension Localization on String {
   //
-  static var t1 = Translations.byText("en_us") +
-      {
-        "en_us": "Mobile phone",
-        "pt_br": "Celular",
-        "pt_pt": "Telemóvel",
-      } +
-      {
-        "en_us": "Address",
-        "pt_br": "Endereço",
-        "pt": "Morada",
-      };
+  test("Fallbacks", () {
+    //
+    DefaultLocale.set("zh_Hant_CN");
 
-  static var t2 = Translations.byText("en") +
-      {
-        "en": "Mobile phone",
-        "pt_br": "Celular",
-        "pt_pt": "Telemóvel",
-      } +
-      {
-        "en": "Address",
-        "pt_br": "Endereço",
-        "pt": "Morada",
-      };
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en_us") +
+                {
+                  "en_us": "A",
+                  "zh_hant_cn": "B",
+                  "zh_hanz_cn": "C",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg ==
+                'Locale "en_us" is not a valid BCP47 locale identifier. Try "en-US".')));
 
-  String get i18n_1 => localize(this, t1);
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hant_cn": "B",
+                  "zh_hanz_cn": "C",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
 
-  String get i18n_2 => localize(this, t2);
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hant_cn": "B",
+                  "zh_hanz_cn": "C",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_hant_cn");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hant": "B",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_hant_cn");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh": "B",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_hant_cn");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "pt": "B",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_Hant_CN");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hanz_cn": "B",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_Hant");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hant_cn": "B",
+                  "zh_hanz_cn": "C",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_Hant");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hant_cn": "B",
+                  "zh_hant": "C",
+                  "zh_hant_hk": "D",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh_Hant");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hanz_cn": "B", // Matched by "zh" only.
+                  "zh_hanz": "C",
+                  "zh_hanz_hk": "D",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hanz_cn": "B", // Matched by "zh" only.
+                  "zh_hanz": "C",
+                  "zh_hanz_hk": "D",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hanz_cn": "B", // Matched by "zh" only.
+                  "zh_hanz": "C",
+                  "zh_hanz_hk": "D",
+                  "zh_hant": "E",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+
+    DefaultLocale.set("zh");
+
+    expect(
+        () => localize(
+            "A",
+            Translations.byText("en-US") +
+                {
+                  "en_us": "A",
+                  "zh_hanz_cn": "B", // Matched by "zh" only.
+                  "zh_hanz": "C",
+                  "zh_hanz_hk": "D",
+                  "zh_hant": "E",
+                  "zh": "F",
+                }),
+        throwsA(predicate((e) =>
+            e is TranslationsException &&
+            e.msg == 'Locale "en_us" should be "en-US" (for translatable string "A").')));
+
+    // ---------
+  });
 }

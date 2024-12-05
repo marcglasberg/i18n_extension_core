@@ -11,13 +11,13 @@ import 'typedefs.dart';
 /// It may be instantiated with the [Translations.byLocale] constructor.
 ///
 /// ```
-/// static var t = Translations.byLocale("en_us") +
+/// static var t = Translations.byLocale("en-US") +
 ///   {
-///      "en_us": {
+///      "en-US": {
 ///        "Hi.": "Hi.",
 ///        "Goodbye.": "Goodbye.",
 ///      },
-///      "es_es": {
+///      "es-ES": {
 ///        "Hi.": "Hola.",
 ///        "Goodbye.": "Adiós.",
 ///      }
@@ -41,12 +41,12 @@ class TranslationsByLocale< //
   /// It's something like this:
   ///
   ///       'Hi': { // TKEY
-  ///         'en_us': 'Hi', // LOCALE : TRAN
-  ///         'pt_br': 'Olá', // LOCALE : TRAN
+  ///         'en-US': 'Hi', // LOCALE : TRAN
+  ///         'pt-BR': 'Olá', // LOCALE : TRAN
   ///       },
   ///       'Goodbye': { // TKEY
-  ///         'en_us': 'Goodbye', // LOCALE : TRAN
-  ///         'pt_br': 'Adeus', // LOCALE : TRAN
+  ///         'en-US': 'Goodbye', // LOCALE : TRAN
+  ///         'pt-BR': 'Adeus', // LOCALE : TRAN
   ///       }
   @override
   Map<TKEY, TRANbyLOCALE> get translationByLocale_ByTranslationKey =>
@@ -58,13 +58,13 @@ class TranslationsByLocale< //
   /// It may be instantiated with the [Translations.byLocale] constructor.
   ///
   /// ```
-  /// static var t = Translations.byLocale("en_us") +
+  /// static var t = Translations.byLocale("en-US") +
   ///   {
-  ///      "en_us": {
+  ///      "en-US": {
   ///        "Hi.": "Hi.",
   ///        "Goodbye.": "Goodbye.",
   ///      },
-  ///      "es_es": {
+  ///      "es-ES": {
   ///        "Hi.": "Hola.",
   ///        "Goodbye.": "Adiós.",
   ///      }
@@ -73,20 +73,20 @@ class TranslationsByLocale< //
   TranslationsByLocale(String defaultLocaleStr)
       : byKey = TranslationsByText(defaultLocaleStr),
         super.gen(
-          defaultLocaleStr: normalizeLocale(defaultLocaleStr),
+          defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
         );
 
   /// Adds a Map [addedMap] of translations to a [Translations] object. Example:
   ///
   /// ```dart
-  /// var t = Translations.byLocale("en_us") +
-  ///         { "en_us":                  // LOCALE
+  /// var t = Translations.byLocale("en-US") +
+  ///         { "en-US":                  // LOCALE
   ///               {
   ///               "Hi": "Hi",           // TKEY : TRAN == TRANbyTKEY
   ///               "Goodbye": "Goodbye"  // TKEY : TRAN == TRANbyTKEY
   ///               },
-  ///           "es_es":                  // LOCALE
+  ///           "es-ES":                  // LOCALE
   ///               {
   ///               "Hi": "Hola",         // TKEY : TRAN == TRANbyTKEY
   ///               "Goodbye": "Adiós"    // TKEY : TRAN == TRANbyTKEY
@@ -131,11 +131,11 @@ class TranslationsByLocale< //
   /// Example:
   ///
   /// ```
-  /// var t1 = Translations.byLocale("en_us") + {"en_us": "Hi.", "pt_br": "Olá."};
-  /// var t2 = Translations.byLocale("en_us") + {"en_us": "Goodbye.", "pt_br": "Adeus."};
+  /// var t1 = Translations.byLocale("en-US") + {"en-US": "Hi.", "pt-BR": "Olá."};
+  /// var t2 = Translations.byLocale("en-US") + {"en-US": "Goodbye.", "pt-BR": "Adeus."};
   ///
   /// var translations = t1 * t2;
-  /// print(localize("Hi.", translations, locale: "pt_br");
+  /// print(localize("Hi.", translations, locale: "pt-BR");
   ///
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(

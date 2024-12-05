@@ -12,16 +12,16 @@ void main() {
     expect(Translations.missingKeys, isEmpty);
     expect(Translations.missingTranslations, isEmpty);
 
-    // Since en_US was never defines, it keeps the Spanish translation.
-    DefaultLocale.set("en_US");
+    // Since en-US was never defines, it keeps the Spanish translation.
+    DefaultLocale.set("en-US");
     expect('continue'.i18n, 'Continuar');
     expect(Translations.missingKeys, isEmpty);
-    expect(Translations.missingTranslations, [TranslatedString(locale: 'en_us', key: 'continue')]);
+    expect(Translations.missingTranslations, [TranslatedString(locale: 'en-US', key: 'continue')]);
 
     // Now we try a key that doesn't exist. They missing key should be in Spanish.
     expect('xxx'.i18n, 'xxx');
     expect(Translations.missingKeys, [TranslatedString(locale: 'es', key: 'xxx')]);
-    expect(Translations.missingTranslations, [TranslatedString(locale: 'en_us', key: 'continue')]);
+    expect(Translations.missingTranslations, [TranslatedString(locale: 'en-US', key: 'continue')]);
   });
 }
 

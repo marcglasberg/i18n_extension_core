@@ -1,6 +1,6 @@
 name: i18n_extension_core
 description: Dart-only package for Translation and Internationalization (i18n), with Dart extensions. Easy to use for both large and small projects.
-version: 2.0.7
+version: 3.0.0
 # author: Marcelo Glasberg <marcglasberg@gmail.com>
 homepage: https://github.com/marcglasberg/i18n_extension_core
 topics:

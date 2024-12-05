@@ -6,9 +6,9 @@ enum MyTranslations { hi, goodbye, letsGo, person }
 void main() {
   //
   test("Empty translations.", () {
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
 
-    var t = Translations.byId("en_us", <String, Map<String, String>>{});
+    var t = Translations.byId("en-US", <String, Map<String, String>>{});
     expect(t.length, 0);
     expect(t.translationByLocale_ByTranslationKey, {});
     expect(
@@ -18,21 +18,21 @@ void main() {
   });
 
   test("Add translations. Generic type: MyTranslations", () {
-    DefaultLocale.set("en_US");
-    var t = Translations.byId<MyTranslations>("en_us", {
+    DefaultLocale.set("en-US");
+    var t = Translations.byId<MyTranslations>("en-US", {
           MyTranslations.hi: {
-            "en_us": "Hi",
-            "pt_br": "Olá",
+            "en-US": "Hi",
+            "pt-BR": "Olá",
           },
           MyTranslations.goodbye: {
-            "en_us": "Goodbye",
-            "pt_br": "Adeus",
+            "en-US": "Goodbye",
+            "pt-BR": "Adeus",
           }
         }) +
         {
           MyTranslations.letsGo: <StringLocale, StringTranslated>{
-            "en_us": "Let's go",
-            "pt_br": "Vamos",
+            "en-US": "Let's go",
+            "pt-BR": "Vamos",
           }
         };
 
@@ -40,16 +40,16 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       MyTranslations.hi: {
-        "en_us": "Hi",
-        "pt_br": "Olá",
+        "en-US": "Hi",
+        "pt-BR": "Olá",
       },
       MyTranslations.goodbye: {
-        "en_us": "Goodbye",
-        "pt_br": "Adeus",
+        "en-US": "Goodbye",
+        "pt-BR": "Adeus",
       },
       MyTranslations.letsGo: {
-        "en_us": "Let's go",
-        "pt_br": "Vamos",
+        "en-US": "Let's go",
+        "pt-BR": "Vamos",
       },
     });
 
@@ -58,43 +58,43 @@ void main() {
         '\n'
         'Translations: ---------------\n'
         'MyTranslations.hi\n'
-        '  en_us | Hi\n'
-        '  pt_br | Olá\n'
+        '  en-US | Hi\n'
+        '  pt-BR | Olá\n'
         '-----------------------------\n'
         'MyTranslations.goodbye\n'
-        '  en_us | Goodbye\n'
-        '  pt_br | Adeus\n'
+        '  en-US | Goodbye\n'
+        '  pt-BR | Adeus\n'
         '-----------------------------\n'
         'MyTranslations.letsGo\n'
-        '  en_us | Let\'s go\n'
-        '  pt_br | Vamos\n'
+        '  en-US | Let\'s go\n'
+        '  pt-BR | Vamos\n'
         '-----------------------------\n');
   });
 
   test("Add translations, mixing more than one tyoe. Generic type not given", () {
-    DefaultLocale.set("en_US");
-    var t = Translations.byId<Object>("en_us", {
+    DefaultLocale.set("en-US");
+    var t = Translations.byId<Object>("en-US", {
           MyTranslations.hi: {
-            "en_us": "Hi",
-            "pt_br": "Olá",
+            "en-US": "Hi",
+            "pt-BR": "Olá",
           },
           MyTranslations.goodbye: {
-            "en_us": "Goodbye",
-            "pt_br": "Adeus",
+            "en-US": "Goodbye",
+            "pt-BR": "Adeus",
           },
           'Privacy policy': <StringLocale, StringTranslated>{
-            "en_us": "We don't sell your data",
-            "pt_br": "Não vendemos suas informações",
+            "en-US": "We don't sell your data",
+            "pt-BR": "Não vendemos suas informações",
           },
         }) +
         {
           'Legal terms': <StringLocale, StringTranslated>{
-            "en_us": "The Legal terms are this and that",
-            "pt_br": "Os termos de uso são isso e aquilo",
+            "en-US": "The Legal terms are this and that",
+            "pt-BR": "Os termos de uso são isso e aquilo",
           },
           MyTranslations.letsGo: {
-            "en_us": "Let's go",
-            "pt_br": "Vamos",
+            "en-US": "Let's go",
+            "pt-BR": "Vamos",
           },
         };
 
@@ -102,24 +102,24 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       MyTranslations.hi: {
-        "en_us": "Hi",
-        "pt_br": "Olá",
+        "en-US": "Hi",
+        "pt-BR": "Olá",
       },
       MyTranslations.goodbye: {
-        "en_us": "Goodbye",
-        "pt_br": "Adeus",
+        "en-US": "Goodbye",
+        "pt-BR": "Adeus",
       },
       'Privacy policy': <StringLocale, StringTranslated>{
-        "en_us": "We don't sell your data",
-        "pt_br": "Não vendemos suas informações",
+        "en-US": "We don't sell your data",
+        "pt-BR": "Não vendemos suas informações",
       },
       'Legal terms': <StringLocale, StringTranslated>{
-        "en_us": "The Legal terms are this and that",
-        "pt_br": "Os termos de uso são isso e aquilo",
+        "en-US": "The Legal terms are this and that",
+        "pt-BR": "Os termos de uso são isso e aquilo",
       },
       MyTranslations.letsGo: {
-        "en_us": "Let's go",
-        "pt_br": "Vamos",
+        "en-US": "Let's go",
+        "pt-BR": "Vamos",
       },
     });
 
@@ -128,41 +128,41 @@ void main() {
         '\n'
         'Translations: ---------------\n'
         'MyTranslations.hi\n'
-        '  en_us | Hi\n'
-        '  pt_br | Olá\n'
+        '  en-US | Hi\n'
+        '  pt-BR | Olá\n'
         '-----------------------------\n'
         'MyTranslations.goodbye\n'
-        '  en_us | Goodbye\n'
-        '  pt_br | Adeus\n'
+        '  en-US | Goodbye\n'
+        '  pt-BR | Adeus\n'
         '-----------------------------\n'
         'Privacy policy\n'
-        '  en_us | We don\'t sell your data\n'
-        '  pt_br | Não vendemos suas informações\n'
+        '  en-US | We don\'t sell your data\n'
+        '  pt-BR | Não vendemos suas informações\n'
         '-----------------------------\n'
         'Legal terms\n'
-        '  en_us | The Legal terms are this and that\n'
-        '  pt_br | Os termos de uso são isso e aquilo\n'
+        '  en-US | The Legal terms are this and that\n'
+        '  pt-BR | Os termos de uso são isso e aquilo\n'
         '-----------------------------\n'
         'MyTranslations.letsGo\n'
-        '  en_us | Let\'s go\n'
-        '  pt_br | Vamos\n'
+        '  en-US | Let\'s go\n'
+        '  pt-BR | Vamos\n'
         '-----------------------------\n');
   });
 
   test("Type `Object?`", () {
-    DefaultLocale.set("en_US");
-    var t = Translations.byId<Object?>("en_us", {
+    DefaultLocale.set("en-US");
+    var t = Translations.byId<Object?>("en-US", {
       MyTranslations.hi: {
-        "en_us": "Hi",
-        "pt_br": "Olá",
+        "en-US": "Hi",
+        "pt-BR": "Olá",
       },
       null: {
-        "en_us": "Null",
-        "pt_br": "nulo",
+        "en-US": "Null",
+        "pt-BR": "nulo",
       },
       'Privacy policy': <StringLocale, StringTranslated>{
-        "en_us": "We don't sell your data",
-        "pt_br": "Não vendemos suas informações",
+        "en-US": "We don't sell your data",
+        "pt-BR": "Não vendemos suas informações",
       },
     });
 
@@ -170,16 +170,16 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       MyTranslations.hi: {
-        "en_us": "Hi",
-        "pt_br": "Olá",
+        "en-US": "Hi",
+        "pt-BR": "Olá",
       },
       null: {
-        "en_us": "Null",
-        "pt_br": "nulo",
+        "en-US": "Null",
+        "pt-BR": "nulo",
       },
       'Privacy policy': <StringLocale, StringTranslated>{
-        "en_us": "We don't sell your data",
-        "pt_br": "Não vendemos suas informações",
+        "en-US": "We don't sell your data",
+        "pt-BR": "Não vendemos suas informações",
       },
     });
 
@@ -188,40 +188,40 @@ void main() {
         '\n'
         'Translations: ---------------\n'
         'MyTranslations.hi\n'
-        '  en_us | Hi\n'
-        '  pt_br | Olá\n'
+        '  en-US | Hi\n'
+        '  pt-BR | Olá\n'
         '-----------------------------\n'
         'null\n'
-        '  en_us | Null\n'
-        '  pt_br | nulo\n'
+        '  en-US | Null\n'
+        '  pt-BR | nulo\n'
         '-----------------------------\n'
         'Privacy policy\n'
-        '  en_us | We don\'t sell your data\n'
-        '  pt_br | Não vendemos suas informações\n'
+        '  en-US | We don\'t sell your data\n'
+        '  pt-BR | Não vendemos suas informações\n'
         '-----------------------------\n');
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(null.i18n, "This is empty");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(null.i18n, "Isso está vazio");
   });
 
   test("Translate manually.", () {
     //
-    var t = Translations.byId("en_us", {
-      123: {"en_us": "One two three", "pt_br": "Um dois três"},
-      "Goodbye": {"en_us": "Goodbye", "pt_br": "Adeus"}
+    var t = Translations.byId("en-US", {
+      123: {"en-US": "One two three", "pt-BR": "Um dois três"},
+      "Goodbye": {"en-US": "Goodbye", "pt-BR": "Adeus"}
     });
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(localize(123, t), "One two three");
     expect(localize("Goodbye", t), "Goodbye");
     expect(localize("Doesn't exist", t), "Doesn't exist"); // Return the original string
     expect(localize(456, t), '456'); // Return the original value.toString()
     expect(localize(true, t), 'true'); // Return the original value.toString()
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(localize(123, t), "Um dois três");
     expect(localize("Goodbye", t), "Adeus");
     expect(localize("Nao existe", t), "Nao existe"); // Return the original string
@@ -236,7 +236,7 @@ void main() {
 
   test("Numeric modifiers.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     var text = "There is 1 item.";
     expect(text.plural(0), "There are no items.");
     expect(text.plural(1), "There is 1 item.");
@@ -245,7 +245,7 @@ void main() {
     expect(text.plural(4), "There are 4 items.");
     expect(text.plural(5), "Yes, you reached 5 items.");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     text = "There is 1 item.";
     expect(text.plural(0), "Não há itens.");
     expect(text.plural(1), "Há 1 item.");
@@ -254,7 +254,7 @@ void main() {
     expect(text.plural(4), "Há 4 itens.");
     expect(text.plural(5), "Sim, você alcançou 5 items.");
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(456.plural(0), "There are no items.");
     expect(456.plural(1), "There is 1 item.");
     expect(456.plural(2), "There are a pair of items.");
@@ -262,7 +262,7 @@ void main() {
     expect(456.plural(4), "There are 4 items.");
     expect(456.plural(5), "Yes, you reached 5 items.");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(456.plural(0), "Não há itens.");
     expect(456.plural(1), "Há 1 item.");
     expect(456.plural(2), "Há um par de itens.");
@@ -270,12 +270,12 @@ void main() {
     expect(456.plural(4), "Há 4 itens.");
     expect(456.plural(5), "Sim, você alcançou 5 items.");
 
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(MyTranslations.person.gender(Gender.male), "There is a man");
     expect(MyTranslations.person.gender(Gender.female), "There is a woman");
     expect(MyTranslations.person.gender(Gender.they), "There is a person");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(MyTranslations.person.gender(Gender.male), "Há um homem");
     expect(MyTranslations.person.gender(Gender.female), "Há uma mulher");
     expect(MyTranslations.person.gender(Gender.they), "Há uma pessoa");
@@ -283,7 +283,7 @@ void main() {
 
   test("Translate using the extension.", () {
     //
-    DefaultLocale.set("en_US");
+    DefaultLocale.set("en-US");
     expect(123.i18n, "One two three");
     expect("There is 1 item.".plural(0), "There are no items.");
     expect("There is 1 item.".plural(1), "There is 1 item.");
@@ -300,7 +300,7 @@ void main() {
     expect(456.plural(5), "Yes, you reached 5 items.");
     expect(456.plural(6), "There are 6 items.");
 
-    DefaultLocale.set("pt_BR");
+    DefaultLocale.set("pt-BR");
     expect(123.i18n, "Um dois três");
     expect("There is 1 item.".plural(0), "Não há itens.");
     expect("There is 1 item.".plural(1), "Há 1 item.");
@@ -324,7 +324,7 @@ void main() {
 //     .two("There are a pair of items.")
 //     .times(5, "Yes, you reached 5 items.")
 //     .many("There are %d items."),
-// "pt_br": "Há 1 item."
+// "pt-BR": "Há 1 item."
 //    .zero("Não há itens.")
 //     .one("Há 1 item.")
 //     .two("Há um par de itens.")
@@ -334,20 +334,20 @@ void main() {
 extension Localization on Object? {
   //
   static final _t = Translations.byId<dynamic>(
-    "en_us",
+    "en-US",
     {
       123: {
-        "en_us": "One two three",
-        "pt_br": "Um dois três",
+        "en-US": "One two three",
+        "pt-BR": "Um dois três",
       },
       "There is 1 item.": {
-        "en_us": "There is 1 item."
+        "en-US": "There is 1 item."
             .zero("There are no items.")
             .one("There is 1 item.")
             .two("There are a pair of items.")
             .times(5, "Yes, you reached 5 items.")
             .many("There are %d items."),
-        "pt_br": "Há 1 item."
+        "pt-BR": "Há 1 item."
             .zero("Não há itens.")
             .one("Há 1 item.")
             .two("Há um par de itens.")
@@ -355,13 +355,13 @@ extension Localization on Object? {
             .many("Há %d itens."),
       },
       456: {
-        "en_us": "There is 1 item."
+        "en-US": "There is 1 item."
             .zero("There are no items.")
             .one("There is 1 item.")
             .two("There are a pair of items.")
             .times(5, "Yes, you reached 5 items.")
             .many("There are %d items."),
-        "pt_br": "Há 1 item."
+        "pt-BR": "Há 1 item."
             .zero("Não há itens.")
             .one("Há 1 item.")
             .two("Há um par de itens.")
@@ -369,18 +369,18 @@ extension Localization on Object? {
             .many("Há %d itens."),
       },
       MyTranslations.person: {
-        "en_us": "There is a person"
+        "en-US": "There is a person"
             .modifier(Gender.male, "There is a man")
             .modifier(Gender.female, "There is a woman")
             .modifier(Gender.they, "There is a person"),
-        "pt_br": "Há uma pessoa"
+        "pt-BR": "Há uma pessoa"
             .modifier(Gender.male, "Há um homem")
             .modifier(Gender.female, "Há uma mulher")
             .modifier(Gender.they, "Há uma pessoa"),
       },
       null: {
-        "en_us": "This is empty",
-        "pt_br": "Isso está vazio",
+        "en-US": "This is empty",
+        "pt-BR": "Isso está vazio",
       },
     },
   );

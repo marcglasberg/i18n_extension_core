@@ -13,7 +13,7 @@ import 'utils.dart' as utils;
 /// Glossary:
 /// * [translatable string]: The string you want to translate.
 /// * [translation-key]: The key that represents the translatable string (may be the string itself).
-/// * [locale]: The language and country code, like "en_us" or "pt_br".
+/// * [locale]: The language and country code, like "en-US" or "pt-BR".
 /// * [translated string]: The translated strings for a given [translation-key].
 /// * [identifier]: An immutable variable that you may use as a translation-key, instead of the string itself.
 ///
@@ -31,10 +31,10 @@ import 'utils.dart' as utils;
 /// [Translations.byText] example:
 ///
 /// ```
-/// var t = Translations.byText("en_us") +
+/// var t = Translations.byText("en-US") +
 ///       const {
-///         "en_us": "i18n Demo",
-///         "pt_br": "Demonstração i18n",
+///         "en-US": "i18n Demo",
+///         "pt-BR": "Demonstração i18n",
 ///       };
 /// ```
 /// ---
@@ -42,13 +42,13 @@ import 'utils.dart' as utils;
 /// [Translations.byLocale] example:
 ///
 /// ```
-/// var t = Translations.byLocale("en_us") +
+/// var t = Translations.byLocale("en-US") +
 ///   {
-///      "en_us": {
+///      "en-US": {
 ///        "Hi.": "Hi.",
 ///        "Goodbye.": "Goodbye.",
 ///      },
-///      "es_es": {
+///      "es-ES": {
 ///        "Hi.": "Hola.",
 ///        "Goodbye.": "Adiós.",
 ///      }
@@ -59,14 +59,14 @@ import 'utils.dart' as utils;
 /// [Translations.byId] example:
 ///
 /// ```
-/// var t = Translations.byId<MyColors>("en_us", {
+/// var t = Translations.byId<MyColors>("en-US", {
 ///   MyColors.red: {
-///       "en_us": "red",
-///       "pt_br": "vermelho",
+///       "en-US": "red",
+///       "pt-BR": "vermelho",
 ///   },
 ///   MyColors.green: {
-///       "en_us": "green",
-///       "pt_br": "Verde",
+///       "en-US": "green",
+///       "pt-BR": "Verde",
 ///   });
 /// ```
 /// ---
@@ -75,11 +75,11 @@ import 'utils.dart' as utils;
 ///
 /// ```
 /// const t = ConstTranslations(
-///    "en_us",
+///    "en-US",
 ///    {
 ///      "i18n Demo": {
-///        "en_us": "i18n Demo",
-///        "pt_br": "Demonstração i18n",
+///        "en-US": "i18n Demo",
+///        "pt-BR": "Demonstração i18n",
 ///      }
 ///    },
 /// );
@@ -103,10 +103,10 @@ abstract class Translations< //
   /// string, and so on; and then you add translations with the [+] operator. For example:
   ///
   /// ```
-  /// static final t = Translations.byText("en_us") +
+  /// static final t = Translations.byText("en-US") +
   ///       const {
-  ///         "en_us": "i18n Demo",
-  ///         "pt_br": "Demonstração i18n",
+  ///         "en-US": "i18n Demo",
+  ///         "pt-BR": "Demonstração i18n",
   ///       };
   /// ```
   ///
@@ -125,13 +125,13 @@ abstract class Translations< //
   /// all translations together:
   ///
   /// ```
-  /// static var t = Translations.byLocale("en_us") +
+  /// static var t = Translations.byLocale("en-US") +
   ///   {
-  ///      "en_us": {
+  ///      "en-US": {
   ///        "Hi.": "Hi.",
   ///        "Goodbye.": "Goodbye.",
   ///      },
-  ///      "es_es": {
+  ///      "es-ES": {
   ///        "Hi.": "Hola.",
   ///        "Goodbye.": "Adiós.",
   ///      }
@@ -159,29 +159,29 @@ abstract class Translations< //
   /// ```dart
   /// enum MyColors { red, green }
   ///
-  /// var t = Translations.byId<MyColors>("en_us", {
+  /// var t = Translations.byId<MyColors>("en-US", {
   ///              MyColors.red: {
-  ///                  "en_us": "red",
-  ///                  "pt_br": "vermelho",
+  ///                  "en-US": "red",
+  ///                  "pt-BR": "vermelho",
   ///              },
   ///              MyColors.green: {
-  ///                  "en_us": "green",
-  ///                  "pt_br": "Verde",
+  ///                  "en-US": "green",
+  ///                  "pt-BR": "Verde",
   ///              });
   /// ```
   ///
   /// Note you may also add translations with the [+] operator. For example:
   ///
   /// ```
-  /// var t = Translations.byId<MyColors>("en_us", {
+  /// var t = Translations.byId<MyColors>("en-US", {
   ///              MyColors.red: {
-  ///                  "en_us": "red",
-  ///                  "pt_br": "vermelho",
+  ///                  "en-US": "red",
+  ///                  "pt-BR": "vermelho",
   ///              }) +
   ///              {
   ///                  MyColors.green: {
-  ///                     "en_us": "green",
-  ///                     "pt_br": "Verde",
+  ///                     "en-US": "green",
+  ///                     "pt-BR": "Verde",
   ///                  }
   ///              };
   /// ```
@@ -190,18 +190,18 @@ abstract class Translations< //
   /// or even `Object?` (or `dynamic`). For example:
   ///
   /// ```
-  /// var t = Translations.byId<Object?>("en_us", {
+  /// var t = Translations.byId<Object?>("en-US", {
   ///              MyColors.red: {
-  ///                  "en_us": "red",
-  ///                  "pt_br": "vermelho",
+  ///                  "en-US": "red",
+  ///                  "pt-BR": "vermelho",
   ///              },
   ///              123: {
-  ///                  "en_us": "One two three",
-  ///                  "pt_br": "Um dois três",
+  ///                  "en-US": "One two three",
+  ///                  "pt-BR": "Um dois três",
   ///              },
   ///              null: {
-  ///                  "en_us": "This is empty",
-  ///                  "pt_br": "Isso está vazio",
+  ///                  "en-US": "This is empty",
+  ///                  "pt-BR": "Isso está vazio",
   ///              });
   /// ```
   ///
@@ -255,12 +255,12 @@ abstract class Translations< //
   /// It's something like this:
   ///
   ///       'Hi': { // TKEY
-  ///         'en_us': 'Hi', // LOCALE : TRAN
-  ///         'pt_br': 'Olá', // LOCALE : TRAN
+  ///         'en-US': 'Hi', // LOCALE : TRAN
+  ///         'pt-BR': 'Olá', // LOCALE : TRAN
   ///       },
   ///       'Goodbye': { // TKEY
-  ///         'en_us': 'Goodbye', // LOCALE : TRAN
-  ///         'pt_br': 'Adeus', // LOCALE : TRAN
+  ///         'en-US': 'Goodbye', // LOCALE : TRAN
+  ///         'pt-BR': 'Adeus', // LOCALE : TRAN
   ///       }
   final Map<TKEY, TRANbyLOCALE> translationByLocale_ByTranslationKey;
 
@@ -271,7 +271,7 @@ abstract class Translations< //
   /// and take the first part before any underscore. The language code is always at the
   /// beginning of the locale identifier and is separated from any subsequent parts
   /// (like country/region or script) by an underscore.
-  String get defaultLanguageStr => utils.normalizeLocale(defaultLocaleStr).split('_')[0];
+  String get defaultLanguageStr => utils.checkLocale(defaultLocaleStr).split('_')[0];
 
   /// Returns the number of translation-keys.
   /// For example, if you have translations for "Hi" and "Goodbye", this will return 2.
@@ -285,11 +285,11 @@ abstract class Translations< //
   /// Example:
   ///
   /// ```
-  /// var t1 = Translations.byText("en_us") + {"en_us": "Hi.", "pt_br": "Olá."};
-  /// var t2 = Translations.byText("en_us") + {"en_us": "Goodbye.", "pt_br": "Adeus."};
+  /// var t1 = Translations.byText("en-US") + {"en-US": "Hi.", "pt-BR": "Olá."};
+  /// var t2 = Translations.byText("en-US") + {"en-US": "Goodbye.", "pt-BR": "Adeus."};
   ///
   /// var translations = t1 * t2;
-  /// print(localize("Hi.", translations, locale: "pt_br");
+  /// print(localize("Hi.", translations, locale: "pt-BR");
   ///
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translationsObj);
@@ -308,19 +308,20 @@ abstract class Translations< //
 /// then all locale translations of the second one, and so on.
 ///
 /// ```
-/// static const t = ConstTranslations("en_us",
+/// static const t = ConstTranslations("en-US",
 ///    {
 ///      "i18n Demo": {
-///        "en_us": "i18n Demo",
-///        "pt_br": "Demonstração i18n",
+///        "en-US": "i18n Demo",
+///        "pt-BR": "Demonstração i18n",
 ///      }
 ///    },
 /// );
 /// ```
 ///
-/// IMPORTANT: Make sure the [defaultLocaleStr] you provide is correct (no spaces, lowercase etc).
-/// Since this constructor is const, we can't normalize the locale string for you. If you are
-/// not sure, call [ConstTranslations.normalizeLocale] before using it.
+/// IMPORTANT: Make sure the [defaultLocaleStr] you provide is a syntactically valid
+/// Unicode BCP47 Locale Identifier. Since this constructor is const, we can't normalize
+/// the locale string for you. If you are not sure, call [ConstTranslations.normalizeLocale]
+/// before using it.
 ///
 /// ---
 /// This class is visible from both [i18_exception] and [i18_exception_core] packages.
@@ -342,11 +343,11 @@ class ConstTranslations< //
   /// then all locale translations of the second one, and so on.
   ///
   /// ```
-  /// static const t = ConstTranslations("en_us",
+  /// static const t = ConstTranslations("en-US",
   ///    {
   ///      "i18n Demo": {
-  ///        "en_us": "i18n Demo",
-  ///        "pt_br": "Demonstração i18n",
+  ///        "en-US": "i18n Demo",
+  ///        "pt-BR": "Demonstração i18n",
   ///      }
   ///    },
   /// );
@@ -377,12 +378,12 @@ class ConstTranslations< //
   /// * Turns the locale into lowercase.
   /// * Throws a [TranslationsException] if the locale has more than 20 characters or fewer than 2.
   /// Examples:
-  /// * ` en_us_ ` becomes `en_us`.
-  /// * ` en__us_ ` becomes `en_us`.
-  /// * ` en-us ` becomes `en_us`.
+  /// * ` en-US_ ` becomes `en-US`.
+  /// * ` en__us_ ` becomes `en-US`.
+  /// * ` en-us ` becomes `en-US`.
   /// * `en-` becomes `en`.
   ///
-  static String normalizeLocale(String locale) => utils.normalizeLocale(locale);
+  static String normalizeLocale(String locale) => utils.checkLocale(locale);
 
   /// You can't add a <Map> to a `ConstTranslations`.
   /// Which means operator `+` is not supported for `ConstTranslations`.
@@ -396,14 +397,14 @@ class ConstTranslations< //
   ///
   /// ```dart
   /// // Doesn't work:
-  /// var t = const ConstTranslations("en_us", {...}}) + Translations.byText("en_us");
+  /// var t = const ConstTranslations("en-US", {...}}) + Translations.byText("en-US");
   /// ```
   ///
   /// However, you can add a `ConstTranslations` to a regular `Translations`:
   ///
   /// ```dart
   /// // Works:
-  /// var t = Translations.byText("en_us") + const ConstTranslations("en_us", {...}});
+  /// var t = Translations.byText("en-US") + const ConstTranslations("en-US", {...}});
   /// ```
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(

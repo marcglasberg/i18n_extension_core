@@ -14,13 +14,13 @@ void main() {
 
 extension Localization on String {
   //
-  static final _t = Translations.byText("en_us") +
+  static final _t = Translations.byText("en-US") +
       {
-        "en_us": "Hello World",
+        "en-US": "Hello World",
         "pt": "Olá Mundo",
       } +
       {
-        "en_us": "%s is %s years old",
+        "en-US": "%s is %s years old",
         "pt": "%s tem %s anos de idade",
       };
 

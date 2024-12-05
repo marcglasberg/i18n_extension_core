@@ -1,7 +1,5 @@
-import 'translated_string.dart';
-import 'translations.dart';
-import 'translations_exception.dart';
-import 'typedefs.dart';
+import 'package:i18n_extension_core/i18n_extension_core.dart';
+
 import 'utils.dart';
 
 /// The [TranslationsByText] class allows you to provide all locale translations of the
@@ -12,10 +10,10 @@ import 'utils.dart';
 /// and then you add translations with the [+] operator. For example:
 ///
 /// ```
-/// static final t = Translations.byText("en_us") +
+/// static final t = Translations.byText("en-US") +
 ///       const {
-///         "en_us": "i18n Demo",
-///         "pt_br": "Demonstração i18n",
+///         "en-US": "i18n Demo",
+///         "pt-BR": "Demonstração i18n",
 ///       };
 /// ```
 ///
@@ -40,15 +38,15 @@ class TranslationsByText< //
   /// and then you add translations with the [+] operator. For example:
   ///
   /// ```
-  /// static final t = Translations.byText("en_us") +
+  /// static final t = Translations.byText("en-US") +
   ///       const {
-  ///         "en_us": "i18n Demo",
-  ///         "pt_br": "Demonstração i18n",
+  ///         "en-US": "i18n Demo",
+  ///         "pt-BR": "Demonstração i18n",
   ///       };
   /// ```
   TranslationsByText(String defaultLocaleStr)
       : super.gen(
-          defaultLocaleStr: normalizeLocale(defaultLocaleStr),
+          defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{},
         );
 
@@ -69,9 +67,9 @@ class TranslationsByText< //
   /// Adds a Map [addedMap] of translations to a [Translations] object. Example:
   ///
   /// ```dart
-  /// var t = Translations.byText("en_us") +
-  ///         {"en_us": "Hi", "pt_br": "Olá" } + // addedMap
-  ///         {"en_us": "Goodbye", "pt_br": "Adeus"}; // Another addedMap
+  /// var t = Translations.byText("en-US") +
+  ///         {"en-US": "Hi", "pt-BR": "Olá" } + // addedMap
+  ///         {"en-US": "Goodbye", "pt-BR": "Adeus"}; // Another addedMap
   /// ```
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator +(ADDEDMAP addedMap) {
@@ -79,8 +77,20 @@ class TranslationsByText< //
     // When using [TranslationsByText], the default locale (a String) is the key of the map.
     String? defaultStringTranslated = addedMap[defaultLocaleStr];
 
-    if (defaultStringTranslated == null)
+    if (defaultStringTranslated == null) {
+      // If the deprecated format (underscore lowercase) matches, throw an error.
+      assert(() {
+        var deprecatedLocale = defaultLocaleStr.replaceAll("-", "_").toLowerCase();
+        String? defaultStringTranslated = addedMap[deprecatedLocale];
+
+        if (defaultStringTranslated != null)
+          throw TranslationsException('Locale "$deprecatedLocale" '
+              'should be "$defaultLocaleStr" (for translatable string "$defaultStringTranslated").');
+        return true;
+      }());
+
       throw TranslationsException("No default translation for '$defaultLocaleStr'.");
+    }
 
     TKEY translationKey = _getTranslationKeyWithModifiers(defaultStringTranslated);
     translationByLocale_ByTranslationKey[translationKey] = addedMap;
@@ -104,18 +114,19 @@ class TranslationsByText< //
   /// Example:
   ///
   /// ```
-  /// var t1 = Translations.byText("en_us") + {"en_us": "Hi.", "pt_br": "Olá."};
-  /// var t2 = Translations.byText("en_us") + {"en_us": "Goodbye.", "pt_br": "Adeus."};
+  /// var t1 = Translations.byText("en-US") + {"en-US": "Hi.", "pt-BR": "Olá."};
+  /// var t2 = Translations.byText("en-US") + {"en-US": "Goodbye.", "pt-BR": "Adeus."};
   ///
   /// var translations = t1 * t2;
-  /// print(localize("Hi.", translations, locale: "pt_br");
+  /// print(localize("Hi.", translations, locale: "pt-BR");
   ///
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translationsObj) {
     //
     if (translationsObj.defaultLocaleStr != defaultLocaleStr)
-      throw TranslationsException("Can't combine translations with different default locales: "
+      throw TranslationsException(
+          "Can't combine translations with different default locales: "
           "'$defaultLocaleStr' and "
           "'${translationsObj.defaultLocaleStr}'.");
 
@@ -160,7 +171,8 @@ class TranslationsByText< //
     return result;
   }
 
-  List<TranslatedString> _translatedStrings(Map<StringLocale, StringTranslated> translation) =>
+  List<TranslatedString> _translatedStrings(
+          Map<StringLocale, StringTranslated> translation) =>
       translation.entries
           .map((entry) => TranslatedString(locale: entry.key, key: entry.value))
           .toList()
@@ -195,7 +207,8 @@ class TranslationsByText< //
 
     if (_translations == null) {
       _translations = {};
-      translationByLocale_ByTranslationKey[translationKey as TKEY] = _translations as ADDEDMAP;
+      translationByLocale_ByTranslationKey[translationKey as TKEY] =
+          _translations as ADDEDMAP;
     }
     _translations[locale] = stringTranslated;
   }

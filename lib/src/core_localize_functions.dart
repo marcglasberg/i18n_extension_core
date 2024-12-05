@@ -1,3 +1,4 @@
+import 'package:i18n_extension_core/src/parse_string.dart';
 import 'package:sprintf/sprintf.dart';
 
 import 'translated_string.dart';
@@ -11,7 +12,7 @@ import 'translations_exception.dart';
 /// If [locale] is not provided (it's `null`), the method will use the default locale
 /// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].
 ///
-/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en_US'.
+/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en-US'.
 ///
 /// ---
 ///
@@ -26,15 +27,15 @@ import 'translations_exception.dart';
 ///   for the default locale).
 ///
 /// Example 1:
-/// If "pt_br" is asked, and "pt_br" is available, return for "pt_br".
+/// If "pt-BR" is asked, and "pt-BR" is available, return for "pt-BR".
 ///
 /// Example 2:
-/// If "pt_br" is asked, "pt_br" is not available, and "pt" is available,
+/// If "pt-BR" is asked, "pt-BR" is not available, and "pt" is available,
 /// return for "pt".
 ///
 /// Example 3:
-/// If "pt_mo" is asked, "pt_mo" and "pt" are not available, but "pt_br" is,
-/// return for "pt_br".
+/// If "pt_mo" is asked, "pt_mo" and "pt" are not available, but "pt-BR" is,
+/// return for "pt-BR".
 ///
 /// ---
 /// This function is visible only from the [i18_exception_core] package.
@@ -58,37 +59,80 @@ String localize(
   }
   //
   else {
-    locale = _effectiveLocale(locale);
+    locale = _normalizedOrDefaultLocale(locale);
 
     if (locale == "null")
-      throw TranslationsException("Locale is the 4 letter string 'null', which is invalid.");
+      throw TranslationsException(
+          "Locale is the 4 letter string 'null', which is invalid.");
 
     // Get the translated string in the language we want.
-    String? translatedString = translatedStringPerLocale[locale];
-
     // Return the translated string in the language we want.
+    String? translatedString = translatedStringPerLocale[locale];
     if (translatedString != null) return translatedString;
 
+    // If the deprecated format (underscore lowercase) matches, throw an error.
+    assert(() {
+      var deprecatedLocale = locale!.replaceAll("-", "_").toLowerCase();
+      translatedString = translatedStringPerLocale[deprecatedLocale];
+      if (translatedString != null)
+        throw TranslationsException('Locale "$deprecatedLocale" '
+            'should be "$locale" (for translatable string "$key").');
+
+      return true;
+    }());
+
     // If there's no translated string in the locale, record it.
-    if (Translations.recordMissingTranslations && locale != translations.defaultLocaleStr) {
+    if (Translations.recordMissingTranslations &&
+        (locale != translations.defaultLocaleStr)) {
       Translations.missingTranslations.add(TranslatedString(locale: locale, key: key));
       Translations.missingTranslationCallback(key, locale);
     }
 
     // ---
 
-    var lang = _language(locale);
+    List<String> parts = locale.split('-');
 
-    // Try finding the translation in the general language. Note: If the locale
-    // is already general, it was already searched, so no need to do it again.
-    if (!_isGeneral(locale)) {
-      translatedString = translatedStringPerLocale[lang];
+    // Try finding language tag that partially matches.
+    // Example: Will match "pt-Latn-BR" with "pt-Latn" first, and if not, with "pt".
+    for (int i = parts.length - 1; i > 0; i--) {
+      String partialLocale = parts.sublist(0, i).join('-');
+      String? translatedString = translatedStringPerLocale[partialLocale];
       if (translatedString != null) return translatedString;
+
+      // If the deprecated format (underscore lowercase) matches, throw an error.
+      assert(() {
+        var deprecatedLocale = partialLocale.replaceAll("-", "_").toLowerCase();
+        translatedString = translatedStringPerLocale[deprecatedLocale];
+        if (translatedString != null)
+          throw TranslationsException('Locale "$deprecatedLocale" '
+              'should be "$partialLocale" (for translatable string "$key").');
+        return true;
+      }());
     }
 
-    // Try finding the translation in any local with that language.
-    for (MapEntry<String, String> entry in translatedStringPerLocale.entries) {
-      if (lang == _language(entry.key)) return entry.value;
+    // Try finding partial language tag that partially matches.
+    for (int i = parts.length; i > 0; i--) {
+      String partialLocale = parts.sublist(0, i).join('-');
+
+      // Example: Will match "pt-Latn-BR" with "pt-Latn-PT" first, and if not,
+      // will match "pt-Latn" with "pt-Latn-PT", and if not,
+      // will match "pt" with "pt-Latn-PT".
+      for (MapEntry<String, String> entry in translatedStringPerLocale.entries) {
+        var entryParts = entry.key.split('-');
+        if (entryParts.length >= i) {
+          var partialMatch = entryParts.sublist(0, i).join('-');
+          if (partialLocale == partialMatch) return entry.value;
+
+          // If the deprecated format (underscore lowercase) matches, throw an error.
+          assert(() {
+            var deprecatedLocale = partialLocale.replaceAll("-", "_").toLowerCase();
+            if (deprecatedLocale == partialMatch) if (translatedString != null)
+              throw TranslationsException('Locale "$deprecatedLocale" '
+                  'should be "$partialMatch" (for translatable string "$key").');
+            return true;
+          }());
+        }
+      }
     }
 
     // If nothing is found, return the value or key,
@@ -97,11 +141,148 @@ String localize(
   }
 }
 
-/// "pt" is a general locale, because it's just a language, while "pt_br" is not.
-bool _isGeneral(String locale) => !locale.contains("_");
-
-/// The language must be everything before the underscore, otherwise this won't work.
-String _language(String locale) => locale.split('_')[0];
+/// ## Interpolation with {id} and maps
+///
+/// Your translations file may declare an `args` method to do interpolations:
+///
+/// ```dart
+/// static var _t = Translations.byText('en-US') +
+///     {
+///       'en-US': 'Hello {student}, this is {teacher}',
+///       'pt-BR': 'Olá {student}, aqui é {teacher}',
+///     };
+///
+/// String get i18n => localize(this, _t);
+///
+/// String args(Object params) => localizeArgs(this, params);
+/// ```
+///
+/// Then you may use it like this:
+///
+/// ```dart
+/// print('Hello {student}, this is {teacher}'.i18n.args({'student': 'John', 'teacher': 'Mary']));
+/// ```
+///
+/// Or like this:
+///
+/// ```dart
+/// print('Hello {student}, this is {teacher}'.i18n.args('John', 'Mary'));
+/// ```
+///
+/// Or like this:
+///
+/// ```dart
+/// print('Hello {student}, this is {teacher}'.i18n.args(['John', 'Mary']));
+/// ```
+///
+/// The above code will print `Hello John, this is Mary` if the locale is English,
+/// or `Olá John, aqui é Mary` if it's Portuguese.
+///
+/// ## Interpolation with {} and lists
+///
+/// ```dart
+/// static var _t = Translations.byText('en-US') +
+/// {
+/// 'en-US': 'Hello {}, this is {}',
+/// 'pt-BR': 'Olá {}, aqui é {}',
+/// };
+///
+/// String get i18n => localize(this, _t);
+///
+/// String args(Object params) => localizeArgs(this, params);
+/// ```
+///
+/// Then you may use it like this:
+///
+/// ```dart
+/// print('Hello {}, this is {}'.i18n.args('John', 'Mary'));
+/// ```
+///
+/// Or like this:
+///
+/// ```dart
+/// print('Hello {}, this is {}'.i18n.args(['John', 'Mary']));
+/// ```
+///
+/// The above code will replace the `{}` in order,
+/// and print `Hello John, this is Mary` if the locale is English,
+/// or `Olá John, aqui é Mary` if it's Portuguese.
+///
+/// The problem of using this interpolation method is that it doesn't allow for the
+/// translated string to change the order of the parameters.
+///
+/// ## Interpolation with {1}, {2} etc., and lists
+///
+/// ```dart
+/// static var _t = Translations.byText('en-US') +
+/// {
+/// 'en-US': 'Hello {1}, this is {2}',
+/// 'pt-BR': 'Olá {1}, aqui é {2}',
+/// };
+///
+/// String get i18n => localize(this, _t);
+///
+/// String args(Object params) => localizeArgs(this, params);
+/// ```
+///
+/// Then you may use it like this:
+///
+/// ```dart
+/// print('Hello {1}, this is {2}'.i18n.args('John', 'Mary'));
+/// ```
+///
+/// Or like this:
+///
+/// ```dart
+/// print('Hello {1}, this is {2}'.i18n.args(['John', 'Mary']));
+/// ```
+///
+/// Or like this:
+///
+/// ```dart
+/// print('Hello {1}, this is {2}'.i18n.args({1: 'John', 2: 'Mary']));
+/// ```
+///
+/// The above code will print `Hello John, this is Mary` if the locale is English,
+/// or `Olá John, aqui é Mary` if it's Portuguese.
+///
+/// This interpolation method allows for the
+/// translated string to change the order of the parameters.
+String localizeArgs(Object? text, Object p1,
+    [Object? p2,
+    Object? p3,
+    Object? p4,
+    Object? p5,
+    Object? p6,
+    Object? p7,
+    Object? p8,
+    Object? p9,
+    Object? p10,
+    Object? p11,
+    Object? p12,
+    Object? p13,
+    Object? p14,
+    Object? p15]) {
+  //
+  return ParseString(
+    text.toString(),
+    p1: p1,
+    p2: p2,
+    p3: p3,
+    p4: p4,
+    p5: p5,
+    p6: p6,
+    p7: p7,
+    p8: p8,
+    p9: p9,
+    p10: p10,
+    p11: p11,
+    p12: p12,
+    p13: p13,
+    p14: p14,
+    p15: p15,
+  ).apply();
+}
 
 /// Does an `sprintf` on the [text] with the [params].
 /// This is implemented with the `sprintf` package: https://pub.dev/packages/sprintf
@@ -135,7 +316,8 @@ String _language(String locale) => locale.split('_')[0];
 /// This function is visible only from the [i18_exception_core] package.
 /// The [i18_exception] package uses a different function with the same name.
 ///
-String localizeFill(Object? text, List<Object> params) => sprintf(text.toString(), params);
+String localizeFill(Object? text, List<Object> params) =>
+    sprintf(text.toString(), params);
 
 /// Returns the translated version for the plural [modifier].
 /// After getting the version, substring `%d` will be replaced with the modifier.
@@ -200,17 +382,29 @@ String localizePlural(
   /// For plural(2), returns the version 2, otherwise the version 2-3-4,
   /// otherwise the version many/1-many, otherwise the unversioned.
   else if (modifierInt == 2)
-    text = versions["2"] ?? versions["C"] ?? versions["M"] ?? versions["R"] ?? versions[null];
+    text = versions["2"] ??
+        versions["C"] ??
+        versions["M"] ??
+        versions["R"] ??
+        versions[null];
 
   /// For plural(3), returns the version 3, otherwise the version 2-3-4,
   /// otherwise the version many/1-many, otherwise the unversioned.
   else if (modifierInt == 3)
-    text = versions["3"] ?? versions["C"] ?? versions["M"] ?? versions["R"] ?? versions[null];
+    text = versions["3"] ??
+        versions["C"] ??
+        versions["M"] ??
+        versions["R"] ??
+        versions[null];
 
   /// For plural(4), returns the version 4, otherwise the version 2-3-4,
   /// otherwise the version many/1-many, otherwise the unversioned.
   else if (modifierInt == 4)
-    text = versions["4"] ?? versions["C"] ?? versions["M"] ?? versions["R"] ?? versions[null];
+    text = versions["4"] ??
+        versions["C"] ??
+        versions["M"] ??
+        versions["R"] ??
+        versions[null];
 
   /// For plural(5), returns the version 5, otherwise the version many/1-many,
   /// otherwise the unversioned.
@@ -231,7 +425,10 @@ String localizePlural(
   /// For plural(<0 or >2), returns the version many/1-many,
   /// otherwise the unversioned.
   else
-    text = versions[modifierInt.toString()] ?? versions["M"] ?? versions["R"] ?? versions[null];
+    text = versions[modifierInt.toString()] ??
+        versions["M"] ??
+        versions["R"] ??
+        versions[null];
 
   // ---
 
@@ -239,7 +436,7 @@ String localizePlural(
     throw TranslationsException("No version found "
         "(modifier: $modifierInt, "
         "key: '$key', "
-        "locale: '${_effectiveLocale(locale)}').");
+        "locale: '${_normalizedOrDefaultLocale(locale)}').");
 
   text = text.replaceAll("%d", modifierInt.toString());
 
@@ -291,7 +488,7 @@ int convertToIntegerModifier(Object? modifierObj) {
 /// If [locale] is not provided (it's `null`), the method will use the default locale
 /// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].
 ///
-/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en_US'.
+/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en-US'.
 ///
 /// ---
 /// This function is visible only from the [i18_exception_core] package.
@@ -311,7 +508,7 @@ String localizeVersion(
     throw TranslationsException("This text has no version for modifier '$modifier' "
         "(modifier: $modifier, "
         "key: '$key', "
-        "locale: '${_effectiveLocale(locale)}').");
+        "locale: '${_normalizedOrDefaultLocale(locale)}').");
 
   List<String> parts = total.split(_splitter1);
 
@@ -328,7 +525,7 @@ String localizeVersion(
   throw TranslationsException("This text has no version for modifier '$modifier' "
       "(modifier: $modifier, "
       "key: '$key', "
-      "locale: '${_effectiveLocale(locale)}').");
+      "locale: '${_normalizedOrDefaultLocale(locale)}').");
 }
 
 /// Use the [localizeAllVersions] method to return a [Map] of all translated strings,
@@ -337,7 +534,7 @@ String localizeVersion(
 /// If [locale] is not provided (it's `null`), the method will use the default locale
 /// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].
 ///
-/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en_US'.
+/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en-US'.
 ///
 /// ---
 /// This function is visible only from the [i18_exception_core] package.
@@ -369,7 +566,7 @@ Map<String?, String> localizeAllVersions(
     if (version.isEmpty)
       throw TranslationsException("Invalid text version for '$part' "
           "(key: '$key', "
-          "locale: '${_effectiveLocale(locale)}').");
+          "locale: '${_normalizedOrDefaultLocale(locale)}').");
 
     all[version] = text;
   }
@@ -380,21 +577,21 @@ Map<String?, String> localizeAllVersions(
 /// To set the default locale, use this class:
 ///
 /// ```dart
-/// DefaultLocale.set("en_US");
-/// DefaultLocale.set("sp_ES");
-/// DefaultLocale.set("pt_BR");
+/// DefaultLocale.set("en-US");
+/// DefaultLocale.set("es-ES");
+/// DefaultLocale.set("pt-BR");
 ///
 /// If you remove the default locale, it's considered English of the Unites States.
-/// DefaultLocale.set(null); // Means "en_US".
-/// DefaultLocale.set(""); // Means "en_US".
+/// DefaultLocale.set(null); // Means "en-US".
+/// DefaultLocale.set(""); // Means "en-US".
 /// ```
 ///
 /// To get the locale as a lowercase string: `DefaultLocale.locale;`
 ///
-/// When you translate strings using [localize], [localizePlural], [localizeVersion]
-/// or [localizeAllVersions], you can pass them the locale as a parameter.
-/// When you don't, the default locale defined here will be used. If you don't
-/// define a default locale, it will be "en_us".
+/// When you translate strings using [localize], [localizeArgs], [localizeFill],
+/// [localizePlural], [localizeVersion] or [localizeAllVersions], you can pass them the
+/// locale as a parameter. When you don't, the default locale defined here will be used.
+/// If you don't define a default locale, it will be "en-US".
 ///
 /// ---
 /// The [DefaultLocale] class is visible only from the [i18_exception_core] package.
@@ -407,29 +604,69 @@ class DefaultLocale {
 
   static String? _locale;
 
-  /// Returns the default locale, as a lowercase String with no spaces, like `en_us`.
-  static String get locale => _locale ?? 'en_US';
+  /// Returns the default locale, as a syntactically valid Unicode BCP47 Locale Identifier.
+  /// Some examples of such identifiers: "en", "en-US", "es-419", "hi-Deva-IN" and
+  /// "zh-Hans-CN". See http://www.unicode.org/reports/tr35/ for technical details.
+  static String get locale => _locale ?? 'en-US';
 
-  /// Use this to set the value of [DefaultLocale.locale].
-  /// Note the locale will be normalized (trims spaces and underscore).
-  /// If you remove the default locale with `DefaultLocale.set(null)`,
+  /// Use the given [locale] to set the value of [DefaultLocale.locale].
+  ///
+  /// It will use [normalizeLocale] to normalize and interpret the given [locale]
+  /// as a BCP47 language tag, to use it as a locale identifier.
+  ///
+  /// Note: If you remove the default locale with `DefaultLocale.set(null)`,
   /// the default will be English of the Unites States.
-  static void set(String? localeStr) => _locale = normalizeLocale(localeStr);
+  ///
+  static void set(String? locale) => _locale = normalizeLocale(locale);
 
-  /// Return the string representation of the given [locale], normalized
-  /// as lowercase, without spaces, and at most a single underscore.
-  static String? normalizeLocale(String? locale) {
-    if (locale == null || locale.isEmpty)
-      return null;
-    else {
-      String str = locale.toLowerCase();
-      RegExp pattern = RegExp('^[_ ]+|[_ ]+\$');
-      return str.replaceAll(pattern, '');
+  /// Normalizes a BCP47 locale identifier by adjusting the case of each component.
+  ///
+  /// This function takes a locale string and normalizes its subtags:
+  /// - Removes spaces and converts underscores to hyphens.
+  /// - The language subtag is converted to lowercase.
+  /// - The script subtag (if present) is converted to title case
+  ///   (first letter uppercase, rest lowercase).
+  /// - The region subtag (if present) is converted to uppercase.
+  ///
+  /// If the input string is null or empty, an empty string is returned.
+  ///
+  /// Example:
+  /// ```dart
+  /// String? localeStr = 'eN-lAtN-us';
+  /// String normalizedLocale = normalizeLocale(localeStr);
+  /// print(normalizedLocale); // Output: en-Latn-US
+  /// ```
+  ///
+  static String? normalizeLocale(String? localeStr) {
+    //
+    if (localeStr == null || localeStr.isEmpty) return null;
+    localeStr = localeStr.replaceAll(' ', '').replaceAll('_', '-');
+
+    // Split the locale string by hyphens
+    List<String> parts = localeStr.split('-').where((part) => part.isNotEmpty).toList();
+    if (parts.isEmpty) return '';
+
+    // Normalize each part of the locale identifier
+    for (int i = 0; i < parts.length; i++) {
+      if (i == 0) {
+        // Language subtag: always lowercase
+        parts[i] = parts[i].toLowerCase();
+      } else if (i == 1 && parts[i].length == 4) {
+        // Script subtag: title case (first letter uppercase, rest lowercase)
+        parts[i] = parts[i][0].toUpperCase() + parts[i].substring(1).toLowerCase();
+      } else if (i == 1 || i == 2) {
+        // Region subtag: always uppercase (usually second or third position)
+        parts[i] = parts[i].toUpperCase();
+      }
     }
+
+    // Join the parts back together with hyphens.
+    return parts.join('-');
   }
 }
 
-String _effectiveLocale(String? locale) => locale?.toLowerCase() ?? DefaultLocale.locale;
+String _normalizedOrDefaultLocale(String? locale) =>
+    DefaultLocale.normalizeLocale(locale) ?? DefaultLocale.locale;
 
 /// Function [recordMissingKey] simply records the given key as a missing
 /// translation with unknown locale. It returns the same [key] provided,
