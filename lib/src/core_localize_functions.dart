@@ -5,9 +5,9 @@ import 'translated_string.dart';
 import 'translations.dart';
 import 'translations_exception.dart';
 
-/// Use the [localize] method to localize a "translatable string" to the given [locale].
-/// You must provide the [key] (which is usually the string you want to translate)
-/// and the [translations] object which holds the translations.
+/// The [localize] function localizes a "translatable string" to the given [languageTag].
+/// You must provide the [key], which is usually the string you want to translate, and
+/// also the [translations] object which holds the translations.
 ///
 /// If [locale] is not provided (it's `null`), the method will use the default locale
 /// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].
@@ -292,12 +292,22 @@ String localizeArgs(Object? text, Object p1,
   ).apply();
 }
 
-/// Does an `sprintf` on the [text] with the [params].
+/// The [localizeFill] function applies a `sprintf` on the [text] with the [params].
 /// This is implemented with the `sprintf` package: https://pub.dev/packages/sprintf
+///
+/// Example:
+///
+/// ```dart
+/// print('Hello %s and %s'.i18n.fill('John', 'Mary');
+///
+/// // Also works
+/// print('Hello %s and %s'.i18n.fill(['John', 'Mary']);
+/// ```
 ///
 /// Possible format values:
 ///
 /// * `%s` - String
+/// * `%1$s` and `%2$s` - 1st String and 2nd String
 /// * `%b` - Binary number
 /// * `%c` - Character according to the ASCII value of `c`
 /// * `%d` - Signed decimal number (negative, zero or positive)
@@ -320,10 +330,6 @@ String localizeArgs(Object? text, Object p1,
 /// * `[0-9]` -  Specifies the minimum width held of to the variable value
 /// * `.[0-9]` - Specifies the number of decimal digits or maximum string length. Example: `%.2f`:
 ///
-/// ---
-/// This function is visible only from the [i18_exception_core] package.
-/// The [i18_exception] package uses a different function with the same name.
-///
 String localizeFill(Object? text, Object p1,
     [Object? p2,
     Object? p3,
@@ -340,7 +346,21 @@ String localizeFill(Object? text, Object p1,
     Object? p14,
     Object? p15]) {
   List<Object?> params = [
-    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15
+    p1,
+    p2,
+    p3,
+    p4,
+    p5,
+    p6,
+    p7,
+    p8,
+    p9,
+    p10,
+    p11,
+    p12,
+    p13,
+    p14,
+    p15
   ].where((param) => param != null).expand((param) {
     if (param is Iterable) {
       return param;
@@ -351,7 +371,7 @@ String localizeFill(Object? text, Object p1,
   return sprintf(text.toString(), params);
 }
 
-/// Returns the translated version for the plural [modifier].
+/// The [localizePlural] function returns the translated version for the plural [modifier].
 /// After getting the version, substring `%d` will be replaced with the modifier.
 ///
 /// Note: This will try to get the most specific plural modifier. For example,
@@ -643,7 +663,7 @@ class DefaultLocale {
   /// Returns the default locale, as a syntactically valid IETF BCP47 language tag
   /// (which is compatible with the Unicode Locale Identifier (ULI) syntax).
   /// Some examples of such identifiers: "en", "en-US", "es-419", "hi-Deva-IN" and
-  /// "zh-Hans-CN". See https://www.ietf.org/rfc/bcp/bcp47.html and  
+  /// "zh-Hans-CN". See https://www.ietf.org/rfc/bcp/bcp47.html and
   /// http://www.unicode.org/reports/tr35/ for details.
   static String get locale => _locale ?? 'en-US';
 
@@ -680,8 +700,9 @@ class DefaultLocale {
   ///
   static String? normalizeLocale(String? localeStr) {
     //
-    if (localeStr == null || localeStr.isEmpty) return null;
+    if (localeStr == null) return null;
     localeStr = localeStr.replaceAll(' ', '').replaceAll('_', '-');
+    if (localeStr.isEmpty) return null;
 
     // Split the locale string by hyphens
     List<String> parts = localeStr.split('-').where((part) => part.isNotEmpty).toList();
