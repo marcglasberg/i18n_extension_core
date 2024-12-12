@@ -21,11 +21,17 @@ class ParseString {
     this.p15,
   });
 
-  /// This method will create the source map and the target map, and then will use both
-  /// of them to apply the parameters to the text.
+  /// This method will first create the source list ([createSourceList]) and the target
+  /// map ([createTargetMap]).
+  ///
+  /// Then, it will use both to apply the params [p1], [p2] etc, to the [text].
+  ///
   String apply() {
+    //
     List<({Object placeholder, int start, int end})> sourceList = createSourceList();
     Map<Object, String> targetMap = createTargetMap();
+
+    // ---
 
     StringBuffer result = StringBuffer();
     int lastCharIndex = 0;
@@ -40,23 +46,32 @@ class ParseString {
       var textBefore = text.substring(lastCharIndex, startChar);
       result.write(textBefore);
 
-      // Get the replacement value
+      // Get the replacement value.
       String? replacement;
+
+      // Single params or lists of params are indexed by integers, like 0 or 1.
+      // For example: `.args("John", "Mary")` or `.args(["John", "Mary"])`
       if (key is int)
         replacement = null;
+      //
+      // Otherwise, maps are indexed by strings, like "name" or "1"
+      // For example: `.args({"name": "John", "other": "Mary"})` or `.args({1: "John", 2: "Mary"})`
       else
         replacement = targetMap[key];
 
+      // Get the single param or param from list, indexed by integers, like 0 or 1.
       if (replacement == null) {
         replacement = targetMap[nakedPlaceholderIndex];
         if (replacement != null) {
           nakedPlaceholderIndex++;
         }
       }
+
+      // If the replacement was found, use it to replace the placeholder.
       if (replacement != null) {
         result.write(replacement);
       } else {
-        // If no replacement found, keep the placeholder as is
+        // If no replacement was found, keep the placeholder as is.
         var placeholder = text.substring(startChar, endChar + 1);
         result.write(placeholder);
       }
@@ -64,25 +79,33 @@ class ParseString {
       lastCharIndex = endChar + 1;
     }
 
-    // Append the remaining text after the last placeholder
+    // Append the remaining text after the last placeholder.
     result.write(text.substring(lastCharIndex));
 
     return result.toString();
   }
 
-  /// Given params [p1], [p2], ... [p15] return a map, following this procedure for each:
-  /// - If the param is a single object, add {i: params.toString()}, where i starts with 0 and is incremented.
-  /// - If the param is a list of n objects, add each one as you'd add a single object.
-  /// - If the param is a map of n objects, return {key.toString(): value.toString()}
+  /// Returns a Map<Object, String> where keys are either integers or strings,
+  /// and values are the string representations of the parameters.
+  ///
+  /// In more detail:
+  ///
+  /// Return a map, given params [p1], [p2], ... [p15], following this procedure for each
+  /// param, recursively:
+  ///
+  /// - If the param is a single object, add {i: params.toString()}, where `i` is an
+  ///   integer, starting with 0 for the first, and progressively incremented.
+  ///
+  /// - If the param is a LIST of n objects, add each one separately, as you'd add a
+  ///   single object.
+  ///
+  /// - If the param is a MAP of n objects, add {key.toString(): value.toString()}
   ///
   /// In other words:
   ///
   /// - Single objects are added with an integer key starting from 0.
   /// - Lists are expanded, and each element is added with consecutive integer keys.
   /// - Maps are added directly with their own key-value pairs (keys are converted to strings).
-  ///
-  /// Returns a Map<Object, String> where keys are either integers or strings,
-  /// and values are the string representations of the parameters.
   ///
   /// Examples:
   /// p1="student" -> {0: "student"}
@@ -139,20 +162,33 @@ class ParseString {
     return result;
   }
 
-  /// Given the [text], return a map:
-  /// - In case of named params, like {student}, the key is "student" (String).
-  /// - In case of indexed params, like {1}, the key is the index, like "1" (String).
-  /// - In case of naked params, like {}, the key is the order (int), i.e., the first naked param is 0, the second is 1, and so on.
+  /// Will parse the [text], that may contain "named", "indexed", or "naked" params, and
+  /// return a list of records containing a placeholder, a start index, and an end index.
   ///
-  /// The value is the range of the param in the text `(int, int)`, both inclusive.
+  /// - Example of named params: "Hello {student}, this is {teacher}"
+  /// - Example of indexed params: "Hello {1}, this is {2}"
+  /// - Example of naked params: "Hello {}, this is {}"
   ///
-  /// For example, "Hello {student}" would result in: {"student": (6, 14)},
-  /// because the "s" in "student" is at position 6, and the "t" is at position 14.
+  /// The placeholder depends on the type of param:
   ///
-  /// Ignores outer placeholders (in case of nested placeholders), and malformed placeholders.
+  /// - In a named param like {student}, the `placeholder` is "student" (String).
+  /// - In an indexed param, like {1}, the key is the index as a string, like "1" (String).
+  /// - In a naked param, like {}, the key is the integer order, i.e., the first naked
+  ///   param is 0, the second is 1, and so on.
+  ///
+  /// The start/end index is the range of the param in the text `(int, int)`, both
+  /// inclusive.
+  ///
+  /// For example, "Hello {student}" would result in: ("student", 6, 14), because
+  /// the "{" before "student" is at position 6, and the "}" after it is at position 14.
+  ///
+  /// The parses ignores outer placeholders (in case of nested placeholders), and
+  /// malformed placeholders.
+  ///
   /// For example "Hello {stu{den}t}" finds "{den}"
   /// For example "Hello {stu{dent}" finds "{dent}"
   /// For example "Hello {1 {2" finds nothing
+  ///
   List<({Object placeholder, int start, int end})> createSourceList() {
     //
     final List<({Object placeholder, int start, int end})> paramsList = [];

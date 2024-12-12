@@ -3,7 +3,7 @@ import 'package:i18n_extension_core/src/translations.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("String interpolations.", () {
+  test("Sprintf interpolations.", () {
     //
     DefaultLocale.set("en-US");
 

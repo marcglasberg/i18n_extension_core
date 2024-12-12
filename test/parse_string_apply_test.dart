@@ -63,8 +63,18 @@ void main() {
     });
 
     test('List parameters', () {
-      final parse = ParseString(
+      var parse = ParseString(
         'Students: {0}, {1}, and {2}',
+        p1: ['Alice', 'Bob', 'Charlie'],
+      );
+
+      expect(parse.apply(), 'Students: Alice, Bob, and Charlie');
+
+      // We invert the order of the indexed placeholders, in the text.
+      // However, params are still applied in the same order.
+      // Only a map like {0: 'Alice', 1: 'Bob', 2: 'Charlie'} would change the order.
+      parse = ParseString(
+        'Students: {2}, {1}, and {0}',
         p1: ['Alice', 'Bob', 'Charlie'],
       );
 
@@ -90,12 +100,19 @@ void main() {
     });
 
     test('Map parameters with indexed keys', () {
-      final parse = ParseString(
+      var parse = ParseString(
         'First: {0}, Second: {1}',
         p1: {'0': 'Alice', '1': 'Bob'},
       );
 
       expect(parse.apply(), 'First: Alice, Second: Bob');
+
+      parse = ParseString(
+        'First: {1}, Second: {0}',
+        p1: {'0': 'Alice', '1': 'Bob'},
+      );
+
+      expect(parse.apply(), 'First: Bob, Second: Alice');
     });
 
     test('List and single parameters combination', () {

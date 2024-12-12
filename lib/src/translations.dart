@@ -300,8 +300,8 @@ abstract class Translations< //
 }
 
 /// The [ConstTranslations] class allows you to define the translations
-/// as a const object, all at once. This not only is a little bit more
-/// efficient, but it's also better for "hot reload", since a const variable
+/// as a const object, all at once. This is a little bit more efficient,
+/// and also better for "hot reload", since a const variable
 /// will respond to hot reloads, while `final` variables will not.
 ///
 /// Here you provide all locale translations of the first "translatable string",
@@ -335,8 +335,8 @@ class ConstTranslations< //
   //
 
   /// The [ConstTranslations] constructor allows you to define the translations
-  /// as a const object, all at once. This not only is a little bit more
-  /// efficient, but it's also better for "hot reload", since a const variable
+  /// as a const object, all at once. This is a little bit more efficient,
+  /// and also better for "hot reload", since a const variable
   /// will respond to hot reloads, while `final` variables will not.
   ///
   /// Here you provide all locale translations of the first "translatable string",
@@ -353,9 +353,10 @@ class ConstTranslations< //
   /// );
   /// ```
   ///
-  /// IMPORTANT: Make sure the [defaultLocaleStr] you provide is correct (no spaces, lowercase etc).
-  /// Since this constructor is const, we can't normalize the locale string for you. If you are
-  /// not sure, call [ConstTranslations.normalizeLocale] before using it.
+  /// IMPORTANT: Make sure the [defaultLocaleStr] you provide is correct (a valid BCP47
+  /// language tag, compatible with the Unicode Locale Identifier (ULI) syntax).
+  /// Since this constructor is const, we can't normalize the locale string for you.
+  /// If you are not sure, call [ConstTranslations.normalizeLocale] before using it.
   ///
   /// See also:
   /// - [Translations.byText], which lets you provide translations for strings.
