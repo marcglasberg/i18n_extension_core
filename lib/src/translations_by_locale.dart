@@ -37,6 +37,10 @@ class TranslationsByLocale< //
   //
   final TranslationsByText<TKEY, TRANbyLOCALE, TRANbyTKEY, TRANbyLOCALE> byKey;
 
+  /// The asset directory where the translations are stored,
+  /// in case they are stored in files.
+  final String? dir;
+
   /// Returns the Map of translations by locale, by translation-key.
   /// It's something like this:
   ///
@@ -71,6 +75,14 @@ class TranslationsByLocale< //
   ///   };
   /// ```
   TranslationsByLocale(String defaultLocaleStr)
+      : byKey = TranslationsByText(defaultLocaleStr),
+        dir = null,
+        super.gen(
+          defaultLocaleStr: checkLocale(defaultLocaleStr),
+          translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
+        );
+
+  TranslationsByLocale.load(String defaultLocaleStr, {required String this.dir})
       : byKey = TranslationsByText(defaultLocaleStr),
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),
@@ -142,7 +154,8 @@ class TranslationsByLocale< //
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translationsByLocale) {
     //
     if (translationsByLocale.defaultLocaleStr != defaultLocaleStr)
-      throw TranslationsException("Can't combine translations with different default locales: "
+      throw TranslationsException(
+          "Can't combine translations with different default locales: "
           "'$defaultLocaleStr' and "
           "'${translationsByLocale.defaultLocaleStr}'.");
     // ---

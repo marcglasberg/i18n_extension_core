@@ -13,13 +13,11 @@ import 'utils.dart' as utils;
 /// Glossary:
 /// * [translatable string]: The string you want to translate.
 /// * [translation-key]: The key that represents the translatable string (may be the string itself).
-/// * [locale]: The language and country code, like "en-US" or "pt-BR".
+/// * [locale]: A valid BCP47 language tag, usually language-script-country, like "en-US", "pt-BR", or "zh-Hans-CN".
 /// * [translated string]: The translated strings for a given [translation-key].
 /// * [identifier]: An immutable variable that you may use as a translation-key, instead of the string itself.
 ///
 /// ---
-///
-/// You may use this class to
 ///
 /// The options are:
 /// * [Translations.byText]
@@ -32,7 +30,7 @@ import 'utils.dart' as utils;
 ///
 /// ```
 /// var t = Translations.byText("en-US") +
-///       const {
+///       {
 ///         "en-US": "i18n Demo",
 ///         "pt-BR": "Demonstração i18n",
 ///       };
@@ -214,17 +212,60 @@ abstract class Translations< //
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  static Translations byId<TKEY>(StringLocale defaultLocaleStr,
-          Map<TKEY, Map<StringLocale, StringTranslated>> translationByLocale_ByTranslationKey) =>
+  static Translations byId<TKEY>(
+          StringLocale defaultLocaleStr,
+          Map<TKEY, Map<StringLocale, StringTranslated>>
+              translationByLocale_ByTranslationKey) =>
       TranslationsByIdentifier<
           TKEY, // The type of the translation-key.
           Map<StringLocale, StringTranslated>, // Translation strings by locale.
           Map<TKEY, StringTranslated>, // Translation strings by translation-key.
-          Map<TKEY, Map<StringLocale, StringTranslated>> // Shape of the added map for operator +.
+          Map<
+              TKEY,
+              Map<StringLocale,
+                  StringTranslated>> // Shape of the added map for operator +.
           >(
         defaultLocaleStr,
         translationByLocale_ByTranslationKey,
       );
+
+  static final Set<TranslationsByLocale> _translationsToLoad = {};
+
+  static void Function(TranslationsByLocale translations)? _loadProcess;
+
+  /// The load process can be set by a third-party package.
+  /// It should modify/mutate the translation map in some way,
+  /// like loading it from a file, or from a database,
+  /// and then rebuild the widgets.
+  static set loadProcess(void Function(TranslationsByLocale translations) value) {
+    _loadProcess = value;
+
+    // If there are translations waiting to load, load them now.
+    if (_translationsToLoad.isNotEmpty) {
+      for (var translations in _translationsToLoad) {
+        _loadProcess!(translations);
+      }
+      _translationsToLoad.clear();
+    }
+  }
+
+  static Translations load(StringLocale defaultLocaleStr, {required String dir}) {
+    var translations = TranslationsByLocale<
+            String,
+            Map<StringLocale, StringTranslated>,
+            Map<String, StringTranslated>,
+            Map<StringLocale, Map<StringLocale, StringTranslated>>>.load(defaultLocaleStr,
+        dir: dir);
+
+    // If the load process has been set, load it.
+    // Otherwise, add it to the list of translations to load in the future.
+    if (_loadProcess != null)
+      _loadProcess!(translations);
+    else
+      _translationsToLoad.add(translations);
+
+    return translations;
+  }
 
   /// All missing keys and translations will be put here.
   /// This may be used in tests to make sure no translations are missing.
@@ -390,7 +431,8 @@ class ConstTranslations< //
   /// Which means operator `+` is not supported for `ConstTranslations`.
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator +(ADDEDMAP addedMap) {
-    throw UnsupportedError("Operator `+` is not supported for class `ConstTranslations`.");
+    throw UnsupportedError(
+        "Operator `+` is not supported for class `ConstTranslations`.");
   }
 
   /// You can't add a `Translation` to a `ConstTranslations`.
@@ -410,6 +452,7 @@ class ConstTranslations< //
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translations) {
-    throw UnsupportedError("Operator `*` is not supported for class `ConstTranslations`.");
+    throw UnsupportedError(
+        "Operator `*` is not supported for class `ConstTranslations`.");
   }
 }

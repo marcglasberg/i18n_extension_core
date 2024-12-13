@@ -5,9 +5,9 @@ import 'translated_string.dart';
 import 'translations.dart';
 import 'translations_exception.dart';
 
-/// The [localize] function localizes a "translatable string" to the given [languageTag].
-/// You must provide the [key], which is usually the string you want to translate, and
-/// also the [translations] object which holds the translations.
+/// The [localize] function localizes a "translatable string" to the given [locale].
+/// You must provide the [key], which is usually the string you want to translate,
+/// and also the [translations] object which holds the translations.
 ///
 /// If [locale] is not provided (it's `null`), the method will use the default locale
 /// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].
