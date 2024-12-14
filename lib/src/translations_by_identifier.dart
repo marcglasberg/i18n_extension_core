@@ -198,7 +198,8 @@ class TranslationsByIdentifier< //
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translationsObj) {
     //
     if (translationsObj.defaultLocaleStr != defaultLocaleStr)
-      throw TranslationsException("Can't combine translations with different default locales: "
+      throw TranslationsException(
+          "Can't combine translations with different default locales: "
           "'$defaultLocaleStr' and "
           "'${translationsObj.defaultLocaleStr}'.");
 
@@ -243,7 +244,8 @@ class TranslationsByIdentifier< //
     return result;
   }
 
-  List<TranslatedString> _translatedStrings(Map<StringLocale, StringTranslated> translation) =>
+  List<TranslatedString> _translatedStrings(
+          Map<StringLocale, StringTranslated> translation) =>
       translation.entries
           .map((entry) => TranslatedString(locale: entry.key, key: entry.value))
           .toList()
@@ -267,7 +269,8 @@ class TranslationsByIdentifier< //
 
     if (_translations == null) {
       _translations = {};
-      translationByLocale_ByTranslationKey[translationKey] = _translations as TRANbyLOCALE;
+      translationByLocale_ByTranslationKey[translationKey] =
+          _translations as TRANbyLOCALE;
     }
     _translations[locale] = stringTranslated;
   }

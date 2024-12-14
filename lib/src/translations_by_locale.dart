@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:i18n_extension_core/src/utils.dart';
 
 import 'translations.dart';
@@ -39,7 +41,12 @@ class TranslationsByLocale< //
 
   /// The asset directory where the translations are stored,
   /// in case they are stored in files.
+  ///
+  /// It can also be an URL, in case the translations are stored in a server.
+  ///
   final String? dir;
+
+  final Completer? completer;
 
   /// Returns the Map of translations by locale, by translation-key.
   /// It's something like this:
@@ -77,6 +84,7 @@ class TranslationsByLocale< //
   TranslationsByLocale(String defaultLocaleStr)
       : byKey = TranslationsByText(defaultLocaleStr),
         dir = null,
+        completer = null,
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
@@ -84,6 +92,7 @@ class TranslationsByLocale< //
 
   TranslationsByLocale.load(String defaultLocaleStr, {required String this.dir})
       : byKey = TranslationsByText(defaultLocaleStr),
+        completer = Completer(),
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.

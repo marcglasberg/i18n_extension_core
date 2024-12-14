@@ -231,25 +231,27 @@ abstract class Translations< //
 
   static final Set<TranslationsByLocale> _translationsToLoad = {};
 
-  static void Function(TranslationsByLocale translations)? _loadProcess;
+  static Future<void> Function(TranslationsByLocale translations)? _loadProcess;
 
   /// The load process can be set by a third-party package.
   /// It should modify/mutate the translation map in some way,
   /// like loading it from a file, or from a database,
   /// and then rebuild the widgets.
-  static set loadProcess(void Function(TranslationsByLocale translations) value) {
+  static set loadProcess(Future<void> Function(TranslationsByLocale translations) value) {
     _loadProcess = value;
 
     // If there are translations waiting to load, load them now.
     if (_translationsToLoad.isNotEmpty) {
-      for (var translations in _translationsToLoad) {
-        _loadProcess!(translations);
+      for (var translation in _translationsToLoad) {
+        _loadProcess!(translation).then((_) {
+          translation.completer?.complete();
+        });
       }
       _translationsToLoad.clear();
     }
   }
 
-  static Translations load(StringLocale defaultLocaleStr, {required String dir}) {
+  static Translations byFile(StringLocale defaultLocaleStr, {required String dir}) {
     var translations = TranslationsByLocale<
             String,
             Map<StringLocale, StringTranslated>,

@@ -24,7 +24,7 @@
 ///
 /// This extension is visible from both [i18_exception] and [i18_exception_core] packages.
 ///
-extension Localization on String {
+extension I18nModifierLocalization on String {
   //
   static const _splitter1 = "\uFFFF";
   static const _splitter2 = "\uFFFE";
