@@ -1,3 +1,4 @@
+import 'package:i18n_extension_core/i18n_extension_core.dart';
 import 'package:i18n_extension_core/src/translations_by_identifier.dart';
 import 'package:i18n_extension_core/src/typedefs.dart';
 
@@ -242,13 +243,20 @@ abstract class Translations< //
 
     // If there are translations waiting to load, load them now.
     if (_translationsToLoad.isNotEmpty) {
-      for (var translation in _translationsToLoad) {
-        _loadProcess!(translation).then((_) {
-          translation.completer?.complete();
-        });
+      for (var translations in _translationsToLoad) {
+        _executeLoadProcess(translations);
       }
       _translationsToLoad.clear();
     }
+  }
+
+  static _executeLoadProcess(TranslationsByLocale translation) {
+    _loadProcess!(translation).then((_) {
+      translation.completer?.complete();
+    }).catchError((error) {
+      translation.completer
+          ?.completeError(TranslationsException('Loading translations failed: $error.'));
+    });
   }
 
   static Translations byFile(StringLocale defaultLocaleStr, {required String dir}) {
@@ -261,10 +269,11 @@ abstract class Translations< //
 
     // If the load process has been set, load it.
     // Otherwise, add it to the list of translations to load in the future.
-    if (_loadProcess != null)
-      _loadProcess!(translations);
-    else
+    if (_loadProcess != null) {
+      _executeLoadProcess(translations);
+    } else {
       _translationsToLoad.add(translations);
+    }
 
     return translations;
   }
