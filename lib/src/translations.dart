@@ -12,7 +12,7 @@ import 'utils.dart' as utils;
 /// Glossary:
 /// * [translatable string]: The string you want to translate.
 /// * [translation-key]: The key that represents the translatable string (may be the string itself).
-/// * [locale]: A valid BCP47 language tag, usually language-script-country, like "en-US", "pt-BR", or "zh-Hans-CN".
+/// * [locale]: A valid BCP47 language tag, usually language-script-country, like 'en-US', 'pt-BR', or 'zh-Hans-CN'.
 /// * [translated string]: The translated strings for a given [translation-key].
 /// * [identifier]: An immutable variable that you may use as a translation-key, instead of the string itself.
 ///
@@ -22,16 +22,17 @@ import 'utils.dart' as utils;
 /// * [Translations.byText]
 /// * [Translations.byLocale]
 /// * [Translations.byId]
+/// * [Translations.byFile]
 /// * [ConstTranslations.new] which can be made const
 /// ---
 ///
 /// [Translations.byText] example:
 ///
 /// ```
-/// var t = Translations.byText("en-US") +
+/// var t = Translations.byText('en-US') +
 ///       {
-///         "en-US": "i18n Demo",
-///         "pt-BR": "Demonstração i18n",
+///         'en-US': 'i18n Demo',
+///         'pt-BR': 'Demonstração i18n',
 ///       };
 /// ```
 /// ---
@@ -39,15 +40,15 @@ import 'utils.dart' as utils;
 /// [Translations.byLocale] example:
 ///
 /// ```
-/// var t = Translations.byLocale("en-US") +
+/// var t = Translations.byLocale('en-US') +
 ///   {
-///      "en-US": {
-///        "Hi.": "Hi.",
-///        "Goodbye.": "Goodbye.",
+///      'en-US': {
+///        'Hi.': 'Hi.',
+///        'Goodbye.': 'Goodbye.',
 ///      },
-///      "es-ES": {
-///        "Hi.": "Hola.",
-///        "Goodbye.": "Adiós.",
+///      'es-ES': {
+///        'Hi.': 'Hola.',
+///        'Goodbye.': 'Adiós.',
 ///      }
 ///   };
 /// ```
@@ -56,15 +57,22 @@ import 'utils.dart' as utils;
 /// [Translations.byId] example:
 ///
 /// ```
-/// var t = Translations.byId<MyColors>("en-US", {
+/// var t = Translations.byId<MyColors>('en-US', {
 ///   MyColors.red: {
-///       "en-US": "red",
-///       "pt-BR": "vermelho",
+///       'en-US': 'red',
+///       'pt-BR': 'vermelho',
 ///   },
 ///   MyColors.green: {
-///       "en-US": "green",
-///       "pt-BR": "Verde",
+///       'en-US': 'green',
+///       'pt-BR': 'Verde',
 ///   });
+/// ```
+/// ---
+///
+/// [Translations.byFile] example:
+///
+/// ```
+/// var t = Translations.byFile('en-US', dir: 'assets/translations');
 /// ```
 /// ---
 ///
@@ -72,11 +80,11 @@ import 'utils.dart' as utils;
 ///
 /// ```
 /// const t = ConstTranslations(
-///    "en-US",
+///    'en-US',
 ///    {
-///      "i18n Demo": {
-///        "en-US": "i18n Demo",
-///        "pt-BR": "Demonstração i18n",
+///      'i18n Demo': {
+///        'en-US': 'i18n Demo',
+///        'pt-BR': 'Demonstração i18n',
 ///      }
 ///    },
 /// );
@@ -100,16 +108,17 @@ abstract class Translations< //
   /// string, and so on; and then you add translations with the [+] operator. For example:
   ///
   /// ```
-  /// static final t = Translations.byText("en-US") +
+  /// static final t = Translations.byText('en-US') +
   ///       const {
-  ///         "en-US": "i18n Demo",
-  ///         "pt-BR": "Demonstração i18n",
+  ///         'en-US': 'i18n Demo',
+  ///         'pt-BR': 'Demonstração i18n',
   ///       };
   /// ```
   ///
   /// See also:
   /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [Translations.byFile], where you load translations from files.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byText(StringLocale defaultLocaleStr) => TranslationsByText<
@@ -122,15 +131,15 @@ abstract class Translations< //
   /// all translations together:
   ///
   /// ```
-  /// static var t = Translations.byLocale("en-US") +
+  /// static var t = Translations.byLocale('en-US') +
   ///   {
-  ///      "en-US": {
-  ///        "Hi.": "Hi.",
-  ///        "Goodbye.": "Goodbye.",
+  ///      'en-US': {
+  ///        'Hi.': 'Hi.',
+  ///        'Goodbye.': 'Goodbye.',
   ///      },
-  ///      "es-ES": {
-  ///        "Hi.": "Hola.",
-  ///        "Goodbye.": "Adiós.",
+  ///      'es-ES': {
+  ///        'Hi.': 'Hola.',
+  ///        'Goodbye.': 'Adiós.',
   ///      }
   ///   };
   /// ```
@@ -138,6 +147,7 @@ abstract class Translations< //
   /// See also:
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byId], which lets you provide translations for identifiers.
+  /// - [Translations.byFile], where you load translations from files.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byLocale(StringLocale defaultLocaleStr) => TranslationsByLocale<
@@ -156,29 +166,29 @@ abstract class Translations< //
   /// ```dart
   /// enum MyColors { red, green }
   ///
-  /// var t = Translations.byId<MyColors>("en-US", {
+  /// var t = Translations.byId<MyColors>('en-US', {
   ///              MyColors.red: {
-  ///                  "en-US": "red",
-  ///                  "pt-BR": "vermelho",
+  ///                  'en-US': 'red',
+  ///                  'pt-BR': 'vermelho',
   ///              },
   ///              MyColors.green: {
-  ///                  "en-US": "green",
-  ///                  "pt-BR": "Verde",
+  ///                  'en-US': 'green',
+  ///                  'pt-BR': 'Verde',
   ///              });
   /// ```
   ///
   /// Note you may also add translations with the [+] operator. For example:
   ///
   /// ```
-  /// var t = Translations.byId<MyColors>("en-US", {
+  /// var t = Translations.byId<MyColors>('en-US', {
   ///              MyColors.red: {
-  ///                  "en-US": "red",
-  ///                  "pt-BR": "vermelho",
+  ///                  'en-US': 'red',
+  ///                  'pt-BR': 'vermelho',
   ///              }) +
   ///              {
   ///                  MyColors.green: {
-  ///                     "en-US": "green",
-  ///                     "pt-BR": "Verde",
+  ///                     'en-US': 'green',
+  ///                     'pt-BR': 'Verde',
   ///                  }
   ///              };
   /// ```
@@ -187,18 +197,18 @@ abstract class Translations< //
   /// or even `Object?` (or `dynamic`). For example:
   ///
   /// ```
-  /// var t = Translations.byId<Object?>("en-US", {
+  /// var t = Translations.byId<Object?>('en-US', {
   ///              MyColors.red: {
-  ///                  "en-US": "red",
-  ///                  "pt-BR": "vermelho",
+  ///                  'en-US': 'red',
+  ///                  'pt-BR': 'vermelho',
   ///              },
   ///              123: {
-  ///                  "en-US": "One two three",
-  ///                  "pt-BR": "Um dois três",
+  ///                  'en-US': 'One two three',
+  ///                  'pt-BR': 'Um dois três',
   ///              },
   ///              null: {
-  ///                  "en-US": "This is empty",
-  ///                  "pt-BR": "Isso está vazio",
+  ///                  'en-US': 'This is empty',
+  ///                  'pt-BR': 'Isso está vazio',
   ///              });
   /// ```
   ///
@@ -209,6 +219,7 @@ abstract class Translations< //
   /// See also:
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [Translations.byFile], where you load translations from files.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byId<TKEY>(
@@ -257,6 +268,119 @@ abstract class Translations< //
     });
   }
 
+  /// The [byFile] constructor allows you to read all locale translations from files.
+  /// Note this works from `i18n_extension`, but not from `i18n_extension_core`.
+  ///
+  /// For example, if you want to load translations from `.json` files in your assets
+  /// directory, create a folder and add some translation files like this:
+  ///
+  /// ```
+  /// assets
+  /// └── translations
+  ///     ├── en-US.json
+  ///     ├── es-ES.json
+  ///     ├── zh-Hans-CN.json
+  ///     └── pt.json
+  /// ```
+  ///
+  /// You can also use `.po` files:
+  ///
+  /// ```
+  /// assets
+  /// └── translations
+  ///     ├── en-US.po
+  ///     ├── es-ES.po
+  ///     ├── zh-Hans-CN.po
+  ///     └── pt.po
+  /// ```
+  ///
+  /// Don't forget to declare your assets directory in your `pubspec.yaml`:
+  ///
+  /// ```yaml
+  /// flutter:
+  ///   assets:
+  ///     - assets/translations/
+  /// ```
+  ///
+  /// Then, you can load the translations using `Translations.byFile()`:
+  ///
+  /// ```dart
+  /// extension MyTranslations on String {
+  ///   static final _t = Translations.byFile('en-US', dir: 'assets/translations');
+  ///   String get i18n => localize(this, _t);
+  /// }
+  /// ```
+  ///
+  /// The above code will asynchronously load all the translations from the `.json`
+  /// and `.po` files present in the `assets/translations` directory, and then rebuild
+  /// your widgets with those new translations.
+  ///
+  /// Note: Since rebuilding widgets when the translations finish loading can cause a
+  /// visible flicker, you can optionally avoid that by preloading the translations
+  /// before running your app. To that end, first create a `load()` method in
+  /// your `MyTranslations` extension:
+  ///
+  /// ```dart
+  /// extension MyTranslations on String {
+  ///   static final _t = Translations.byFile('en-US', dir: 'assets/translations');
+  ///   String get i18n => localize(this, _t);
+  ///
+  ///   static Future<void> load() => _t.load(); // Here!
+  /// }
+  /// ```
+  ///
+  /// And then, in your `main()` method, call `MyTranslations.load()` before running
+  /// the app:
+  ///
+  /// ```dart
+  /// void main() async {
+  ///   WidgetsFlutterBinding.ensureInitialized();
+  ///
+  ///   await MyTranslations.load(); // Here!
+  ///
+  ///   runApp(
+  ///     I18n(
+  ///       initialLocale: await I18n.loadLocale(),
+  ///       autoSaveLocale: true,
+  ///       child: AppCore(),
+  ///     ),
+  ///   );
+  /// }
+  /// ```
+  ///
+  /// Try running
+  /// the <a href="https://github.com/marcglasberg/i18n_extension/blob/master/example/lib/6_load_example/main.dart">
+  /// load example</a>.
+  ///
+  /// Another alternative is using a `FutureBuilder`:
+  ///
+  /// ```dart
+  /// return FutureBuilder(
+  ///   future: MyTranslations.load(),
+  ///   builder: (context, snapshot) {
+  ///     if (snapshot.connectionState == ConnectionState.done) {
+  ///     return MyWidget(...);
+  ///   } else {
+  ///     return const Center(child: CircularProgressIndicator());
+  ///   } ...
+  /// ```
+  ///
+  /// Note: The load process has a default timeout of 0.5 seconds. If the timeout is
+  /// reached, the future returned by `load` will complete, but the load process still
+  /// continues in the background, and the widgets will rebuild automatically when the
+  /// translations finally finish loading. Optionally, you can provide a
+  /// different `timeout` duration.
+  ///
+  /// **Note:** The code to load translations from files is adapted from original code
+  /// created by <a href="https://github.com/bauerj">Johann Bauer</a>.
+  ///
+  ///
+  /// See also:
+  /// - [Translations.byText], which lets you provide translations for strings.
+  /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [Translations.byId], which lets you provide translations for identifiers.
+  /// - [ConstTranslations.new], which responds better to hot reload.
+  ///
   static Translations byFile(StringLocale defaultLocaleStr, {required String dir}) {
     var translations = TranslationsByLocale<
             String,
@@ -289,11 +413,11 @@ abstract class Translations< //
 
   /// Replace this to log missing keys.
   static void Function(Object? key, StringLocale locale) missingKeyCallback =
-      (key, locale) => print("➜ Translation-key in '$locale' is missing: \"$key\".");
+      (key, locale) => print('➜ Translation-key in "$locale" is missing: "$key".');
 
   /// Replace this to log missing translations.
   static void Function(Object? key, StringLocale locale) missingTranslationCallback =
-      (key, locale) => print("➜ There are no translations in '$locale' for \"$key\".");
+      (key, locale) => print('➜ There are no translations in "$locale" for "$key".');
 
   /// Generative constructor.
   const Translations.gen({
@@ -324,7 +448,7 @@ abstract class Translations< //
   String get defaultLanguageStr => utils.checkLocale(defaultLocaleStr).split('_')[0];
 
   /// Returns the number of translation-keys.
-  /// For example, if you have translations for "Hi" and "Goodbye", this will return 2.
+  /// For example, if you have translations for 'Hi' and 'Goodbye', this will return 2.
   int get length;
 
   /// Add a [addedMap] (of type [Map]) to a [Translations] object.
@@ -335,11 +459,11 @@ abstract class Translations< //
   /// Example:
   ///
   /// ```
-  /// var t1 = Translations.byText("en-US") + {"en-US": "Hi.", "pt-BR": "Olá."};
-  /// var t2 = Translations.byText("en-US") + {"en-US": "Goodbye.", "pt-BR": "Adeus."};
+  /// var t1 = Translations.byText('en-US') + {'en-US': 'Hi.', 'pt-BR': 'Olá.'};
+  /// var t2 = Translations.byText('en-US') + {'en-US': 'Goodbye.', 'pt-BR': 'Adeus.'};
   ///
   /// var translations = t1 * t2;
-  /// print(localize("Hi.", translations, locale: "pt-BR");
+  /// print(localize('Hi.', translations, locale: 'pt-BR');
   ///
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translationsObj);
@@ -358,11 +482,11 @@ abstract class Translations< //
 /// then all locale translations of the second one, and so on.
 ///
 /// ```
-/// static const t = ConstTranslations("en-US",
+/// static const t = ConstTranslations('en-US',
 ///    {
-///      "i18n Demo": {
-///        "en-US": "i18n Demo",
-///        "pt-BR": "Demonstração i18n",
+///      'i18n Demo': {
+///        'en-US': 'i18n Demo',
+///        'pt-BR': 'Demonstração i18n',
 ///      }
 ///    },
 /// );
@@ -393,11 +517,11 @@ class ConstTranslations< //
   /// then all locale translations of the second one, and so on.
   ///
   /// ```
-  /// static const t = ConstTranslations("en-US",
+  /// static const t = ConstTranslations('en-US',
   ///    {
-  ///      "i18n Demo": {
-  ///        "en-US": "i18n Demo",
-  ///        "pt-BR": "Demonstração i18n",
+  ///      'i18n Demo': {
+  ///        'en-US': 'i18n Demo',
+  ///        'pt-BR': 'Demonstração i18n',
   ///      }
   ///    },
   /// );
@@ -412,7 +536,7 @@ class ConstTranslations< //
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
-  /// - [ConstTranslations.new], which organizes translations differently.
+  /// - [Translations.byFile], where you load translations from a file.
   ///
   const ConstTranslations(
     StringLocale defaultLocaleStr,
@@ -441,7 +565,7 @@ class ConstTranslations< //
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator +(ADDEDMAP addedMap) {
     throw UnsupportedError(
-        "Operator `+` is not supported for class `ConstTranslations`.");
+        'Operator `+` is not supported for class `ConstTranslations`.');
   }
 
   /// You can't add a `Translation` to a `ConstTranslations`.
@@ -449,19 +573,19 @@ class ConstTranslations< //
   ///
   /// ```dart
   /// // Doesn't work:
-  /// var t = const ConstTranslations("en-US", {...}}) + Translations.byText("en-US");
+  /// var t = const ConstTranslations('en-US', {...}}) + Translations.byText('en-US');
   /// ```
   ///
   /// However, you can add a `ConstTranslations` to a regular `Translations`:
   ///
   /// ```dart
   /// // Works:
-  /// var t = Translations.byText("en-US") + const ConstTranslations("en-US", {...}});
+  /// var t = Translations.byText('en-US') + const ConstTranslations('en-US', {...}});
   /// ```
   @override
   Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, ADDEDMAP> operator *(
       Translations<TKEY, TRANbyLOCALE, TRANbyTKEY, dynamic> translations) {
     throw UnsupportedError(
-        "Operator `*` is not supported for class `ConstTranslations`.");
+        'Operator `*` is not supported for class `ConstTranslations`.');
   }
 }
