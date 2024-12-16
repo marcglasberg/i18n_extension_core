@@ -2,7 +2,7 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
-## 3.0.0-dev.7
+## 3.0.0
 
 * **Breaking Change**: Language codes should now respect the BCP47 standard, when you
   define your translations.  
