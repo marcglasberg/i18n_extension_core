@@ -1,8 +1,6 @@
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 import 'package:i18n_extension_core/src/translations_by_identifier.dart';
-import 'package:i18n_extension_core/src/typedefs.dart';
 
-import 'translated_string.dart';
 import 'translations_by_locale.dart';
 import 'translations_by_text.dart';
 import 'utils.dart' as utils;
@@ -250,7 +248,7 @@ abstract class Translations< //
     }
   }
 
-  static _executeLoadProcess(TranslationsByLocale translation) {
+  static void _executeLoadProcess(TranslationsByLocale translation) {
     _loadProcess!(translation).then((_) {
       translation.completer?.complete();
     }).catchError((error) {
