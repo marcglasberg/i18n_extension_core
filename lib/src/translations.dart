@@ -23,6 +23,7 @@ import 'utils.dart' as utils;
 /// * [Translations.byLocale]
 /// * [Translations.byId]
 /// * [Translations.byFile]
+/// * [Translations.byHttp]
 /// * [ConstTranslations.new] which can be made const
 /// ---
 ///
@@ -76,6 +77,13 @@ import 'utils.dart' as utils;
 /// ```
 /// ---
 ///
+/// [Translations.byHttp] example:
+///
+/// ```
+/// var t = Translations.byHttp('en-US', url: 'https://example.com/translations.json');
+/// ```
+/// ---
+///
 /// [ConstTranslations.new] example:
 ///
 /// ```
@@ -119,6 +127,7 @@ abstract class Translations< //
   /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [Translations.byFile], where you load translations from files.
+  /// - [Translations.byHttp], where you load translations from the web.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byText(StringLocale defaultLocaleStr) => TranslationsByText<
@@ -148,6 +157,7 @@ abstract class Translations< //
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byFile], where you load translations from files.
+  /// - [Translations.byHttp], where you load translations from the web.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byLocale(StringLocale defaultLocaleStr) => TranslationsByLocale<
@@ -220,6 +230,7 @@ abstract class Translations< //
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [Translations.byFile], where you load translations from files.
+  /// - [Translations.byHttp], where you load translations from the web.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byId<TKEY>(
@@ -239,28 +250,57 @@ abstract class Translations< //
         translationByLocale_ByTranslationKey,
       );
 
-  static final Set<TranslationsByLocale> _translationsToLoad = {};
+  static final Set<TranslationsByLocale> _translationsToLoadByFile = {};
 
-  static Future<void> Function(TranslationsByLocale translations)? _loadProcess;
+  static final Set<TranslationsByLocale> _translationsToLoadByHttp = {};
 
-  /// The load process can be set by a third-party package.
+  /// Load process used by [Translations.byFile].
+  static Future<void> Function(TranslationsByLocale translations)? _loadByFile;
+
+  /// Download process used by [Translations.byHttp].
+  static Future<void> Function(TranslationsByLocale translations)? _loadByHttp;
+
+  /// The load-by-file process can be set by a third-party package.
   /// It should modify/mutate the translation map in some way,
-  /// like loading it from a file, or from a database,
-  /// and then rebuild the widgets.
-  static set loadProcess(Future<void> Function(TranslationsByLocale translations) value) {
-    _loadProcess = value;
+  /// like loading it from a file, or from a database, and then rebuild the widgets.
+  static set loadByFile(Future<void> Function(TranslationsByLocale translations) value) {
+    _loadByFile = value;
 
     // If there are translations waiting to load, load them now.
-    if (_translationsToLoad.isNotEmpty) {
-      for (var translations in _translationsToLoad) {
-        _executeLoadProcess(translations);
+    if (_translationsToLoadByFile.isNotEmpty) {
+      for (var translations in _translationsToLoadByFile) {
+        _executeLoadByFile(translations);
       }
-      _translationsToLoad.clear();
+      _translationsToLoadByFile.clear();
     }
   }
 
-  static void _executeLoadProcess(TranslationsByLocale translation) {
-    _loadProcess!(translation).then((_) {
+  /// The load-by-http process can be set by a third-party package.
+  /// It should modify/mutate the translation map in some way,
+  /// like loading it from a https address, and then rebuild the widgets.
+  static set loadByHttp(Future<void> Function(TranslationsByLocale translations) value) {
+    _loadByHttp = value;
+
+    // If there are translations waiting to load, load them now.
+    if (_translationsToLoadByHttp.isNotEmpty) {
+      for (var translations in _translationsToLoadByHttp) {
+        _executeLoadByHttp(translations);
+      }
+      _translationsToLoadByHttp.clear();
+    }
+  }
+
+  static void _executeLoadByFile(TranslationsByLocale translation) {
+    _loadByFile!(translation).then((_) {
+      translation.completer?.complete();
+    }).catchError((error) {
+      translation.completer
+          ?.completeError(TranslationsException('Loading translations failed: $error.'));
+    });
+  }
+
+  static void _executeLoadByHttp(TranslationsByLocale translation) {
+    _loadByHttp!(translation).then((_) {
       translation.completer?.complete();
     }).catchError((error) {
       translation.completer
@@ -365,8 +405,8 @@ abstract class Translations< //
   ///   } ...
   /// ```
   ///
-  /// Note: The load process has a default timeout of 0.5 seconds. If the timeout is
-  /// reached, the future returned by `load` will complete, but the load process still
+  /// Note: The load-by-file process has a default timeout of 0.5 seconds. If the timeout
+  /// is reached, the future returned by `load` will complete, but the load process still
   /// continues in the background, and the widgets will rebuild automatically when the
   /// translations finally finish loading. Optionally, you can provide a
   /// different `timeout` duration.
@@ -379,6 +419,7 @@ abstract class Translations< //
   /// - [Translations.byText], which lets you provide translations for strings.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [Translations.byId], which lets you provide translations for identifiers.
+  /// - [Translations.byHttp], where you load translations from the web.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
   static Translations byFile(StringLocale defaultLocaleStr, {required String dir}) {
@@ -386,15 +427,128 @@ abstract class Translations< //
             String,
             Map<StringLocale, StringTranslated>,
             Map<String, StringTranslated>,
-            Map<StringLocale, Map<StringLocale, StringTranslated>>>.load(defaultLocaleStr,
+            Map<StringLocale, Map<StringLocale, StringTranslated>>>.byFile(
+        defaultLocaleStr,
         dir: dir);
 
-    // If the load process has been set, load it.
+    // If the load-by-file process has been set, load it.
     // Otherwise, add it to the list of translations to load in the future.
-    if (_loadProcess != null) {
-      _executeLoadProcess(translations);
+    if (_loadByFile != null) {
+      _executeLoadByFile(translations);
     } else {
-      _translationsToLoad.add(translations);
+      _translationsToLoadByFile.add(translations);
+    }
+
+    return translations;
+  }
+
+  /// The [byHttp] constructor allows you to read all locale translations from the web.
+  /// Note this works from `i18n_extension`, but not from `i18n_extension_core`.
+  ///
+  /// For example, if you want to load translations from a `.json` or `.po` file:
+  ///
+  ///
+  /// ```dart
+  /// extension MyTranslations on String {
+  ///
+  ///   static final _t = Translations.byHttp('en-US',
+  ///     url: 'https://example.com/translations',
+  ///     resources: ['en-US.json', 'es.json', 'pt-BR.po', 'fr.po']);
+  ///
+  ///   String get i18n => localize(this, _t);
+  /// }
+  /// ```
+  ///
+  /// The above code will asynchronously load all the following translation resources:
+  ///
+  /// https://example.com/translations/en-US.json
+  /// https://example.com/translations/es.json
+  /// https://example.com/translations/pt-BR.po
+  /// https://example.com/translations/fr.po
+  ///
+  /// Then, the widgets will rebuild with those new translations.
+  ///
+  /// Note: Since rebuilding widgets when the translations finish loading can cause a
+  /// visible flicker, you can optionally avoid that by preloading the translations
+  /// before running your app. To that end, first create a `load()` method in
+  /// your `MyTranslations` extension:
+  ///
+  /// ```dart
+  /// extension MyTranslations on String {
+  ///   static final _t = Translations.byHttp('en-US', url: ..., resources: ...);
+  ///   String get i18n => localize(this, _t);
+  ///
+  ///   static Future<void> load() => _t.load(); // Here!
+  /// }
+  /// ```
+  ///
+  /// And then, in your `main()` method, call `MyTranslations.load()` before running
+  /// the app:
+  ///
+  /// ```dart
+  /// void main() async {
+  ///   WidgetsFlutterBinding.ensureInitialized();
+  ///
+  ///   await MyTranslations.load(); // Here!
+  ///
+  ///   runApp(
+  ///     I18n(
+  ///       initialLocale: await I18n.loadLocale(),
+  ///       autoSaveLocale: true,
+  ///       child: AppCore(),
+  ///     ),
+  ///   );
+  /// }
+  /// ```
+  ///
+  /// Another alternative is using a `FutureBuilder`:
+  ///
+  /// ```dart
+  /// return FutureBuilder(
+  ///   future: MyTranslations.load(),
+  ///   builder: (context, snapshot) {
+  ///     if (snapshot.connectionState == ConnectionState.done) {
+  ///     return MyWidget(...);
+  ///   } else {
+  ///     return const Center(child: CircularProgressIndicator());
+  ///   } ...
+  /// ```
+  ///
+  /// Note: The load-by-url process has a default timeout of 1 second. If the timeout is
+  /// reached, the future returned by `load` will complete, but the load process still
+  /// continues in the background, and the widgets will rebuild automatically when the
+  /// translations finally finish loading. Optionally, you can provide a
+  /// different `timeout` duration.
+  ///
+  ///
+  /// See also:
+  /// - [Translations.byText], which lets you provide translations for strings.
+  /// - [Translations.byLocale], where you provide all translations together for each locale.
+  /// - [Translations.byId], which lets you provide translations for identifiers.
+  /// - [Translations.byFile], where you load translations from a file.
+  /// - [ConstTranslations.new], which responds better to hot reload.
+  ///
+  static Translations byHttp(
+    StringLocale defaultLocaleStr, {
+    required String url,
+    required Iterable<String> resources,
+  }) {
+    var translations = TranslationsByLocale<
+        String,
+        Map<StringLocale, StringTranslated>,
+        Map<String, StringTranslated>,
+        Map<StringLocale, Map<StringLocale, StringTranslated>>>.byHttp(
+      defaultLocaleStr,
+      url: url,
+      resources: resources,
+    );
+
+    // If the load-by-http process has been set, load it.
+    // Otherwise, add it to the list of translations to load in the future.
+    if (_loadByHttp != null) {
+      _executeLoadByHttp(translations);
+    } else {
+      _translationsToLoadByHttp.add(translations);
     }
 
     return translations;
@@ -537,6 +691,7 @@ class ConstTranslations< //
   /// - [Translations.byId], which lets you provide translations for identifiers.
   /// - [Translations.byLocale], where you provide all translations together for each locale.
   /// - [Translations.byFile], where you load translations from a file.
+  /// - [Translations.byHttp], where you load translations from the web.
   ///
   const ConstTranslations(
     StringLocale defaultLocaleStr,

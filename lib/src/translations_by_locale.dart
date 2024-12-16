@@ -40,12 +40,22 @@ class TranslationsByLocale< //
   final TranslationsByText<TKEY, TRANbyLOCALE, TRANbyTKEY, TRANbyLOCALE> byKey;
 
   /// The asset directory where the translations are stored,
-  /// in case they are stored in files.
-  ///
-  /// It can also be an URL, in case the translations are stored in a server.
-  ///
+  /// when using [Translations.byFile].
   final String? dir;
 
+  /// The URL address where the translations are stored,
+  /// when using [Translations.byHttp].
+  final String? url;
+
+  /// The list of resources for the [url], when using [Translations.byHttp].
+  /// For example, if the URL is 'https://myserver.com/translations'
+  /// and the resources are ['en-US.json', 'es-ES.json'], the final URLs will be:
+  /// 'https://myserver.com/translations/en-US.json' and 'https://myserver.com/translations/es-ES.json'.
+  /// Note the resources must be the language tag followed by '.json' or '.po'.
+  final Iterable<String>? resources;
+
+  /// The completer to be used when loading translations from a file or from the web,
+  /// when using [Translations.byFile] or [Translations.byHttp].
   final Completer? completer;
 
   /// Returns the Map of translations by locale, by translation-key.
@@ -84,14 +94,30 @@ class TranslationsByLocale< //
   TranslationsByLocale(String defaultLocaleStr)
       : byKey = TranslationsByText(defaultLocaleStr),
         dir = null,
+        url = null,
+        resources = null,
         completer = null,
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
         );
 
-  TranslationsByLocale.load(String defaultLocaleStr, {required String this.dir})
+  TranslationsByLocale.byFile(String defaultLocaleStr, {required String this.dir})
       : byKey = TranslationsByText(defaultLocaleStr),
+        url = null,
+        resources = null,
+        completer = Completer(),
+        super.gen(
+          defaultLocaleStr: checkLocale(defaultLocaleStr),
+          translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
+        );
+
+  TranslationsByLocale.byHttp(
+    String defaultLocaleStr, {
+    required String this.url,
+    required Iterable<String> this.resources,
+  })  : byKey = TranslationsByText(defaultLocaleStr),
+        dir = null,
         completer = Completer(),
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),

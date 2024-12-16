@@ -2,7 +2,20 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
-## 3.0.1
+## 4.0.0
+
+* `Translations.byHttp()` is now available (only when using the `i18n_extension` package).
+  It allows you to load translations from `.json` or `.po` files in the web.
+  Use it like this:
+
+  ```     
+  final translations = Translations.byHttp('en-US', 
+    url: 'https://example.com/translations', 
+    resources: ['en-US.json', 'es.json', 'pt-BR.po', 'fr.po']);
+  );
+  ```
+
+## 3.0.0
 
 * **Breaking Change**: Language codes should now respect the BCP47 standard, when you
   define your translations.  
@@ -46,7 +59,7 @@ Sponsored by [MyText.ai](https://mytext.ai)
   'Hello {} and {}'.i18n.args('John', 'Mary');
   'Hello {} and {}'.i18n.args(['John', 'Mary']);
   ```
-         
+
 
 * Previously, you could do string interpolation by using **sprintf** specifiers,
   like `%s`, `%1$s`, `%d` etc., and providing a list of values to fill them.
@@ -73,6 +86,13 @@ Sponsored by [MyText.ai](https://mytext.ai)
   'Hello %1$s and %2$s'.i18n.fill(['student', 'teacher']);  
   'Hello %s and %s'.i18n.fill('student', 'teacher');
   'Hello %1$s and %2$s'.i18n.fill('student', 'teacher');
+  ```  
+
+* `Translations.byFile()` is now available (only when using the `i18n_extension` package).
+  It allows you to load translations from a `.json` or `.po` file. Use it like this:
+
+  ```     
+  final translations = Translations.byFile('en-US', dir: 'assets/translations');
   ```
 
 ## 2.0.6
