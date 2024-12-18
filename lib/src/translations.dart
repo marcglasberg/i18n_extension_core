@@ -559,19 +559,47 @@ abstract class Translations< //
   static Set<TranslatedString> missingKeys = {};
   static Set<TranslatedString> missingTranslations = {};
 
-  /// If true, records missing keys.
+  /// If true, records missing translations keys.
   static bool recordMissingKeys = true;
 
   /// If true, records missing translations.
   static bool recordMissingTranslations = true;
 
+  /// Contains the locales that are supported, as BCP47 language tags.
+  /// For example: `['en-US', 'pt-BR', 'es', 'zh-Hans-CN']`
+  static Iterable<String> supportedLocales = [];
+
   /// Replace this to log missing keys.
   static void Function(Object? key, StringLocale locale) missingKeyCallback =
       (key, locale) => print('➜ Translation-key in "$locale" is missing: "$key".');
 
-  /// Replace this to log missing translations.
-  static void Function(Object? key, StringLocale locale) missingTranslationCallback =
-      (key, locale) => print('➜ There are no translations in "$locale" for "$key".');
+  /// The default implementation of [missingTranslationCallback] prints missing
+  /// translations to the console. If [supportedLocales] is provided, it will only
+  /// consider missing translations for locales that are supported. If the supported
+  /// locales is empty (not provided) it will log everything.
+  ///
+  /// You can replace this callback with your own implementation.
+  ///
+  /// If it returns true, the missing translation will also be put
+  /// into the [missingTranslations] set.
+  ///
+  static MissingTranslationCallback missingTranslationCallback =
+      _defaultMissingTranslationCallback;
+
+  static bool _defaultMissingTranslationCallback({
+    required Object? key,
+    required StringLocale locale,
+    required Translations translations,
+    required Iterable<String> supportedLocales,
+  }) {
+    if (locale == translations.defaultLocaleStr) return false;
+
+    if (supportedLocales.isEmpty || (supportedLocales.contains(locale))) {
+      print('➜ There are no translations in "$locale" for "$key".');
+      return true;
+    } else
+      return false;
+  }
 
   /// Generative constructor.
   const Translations.gen({
@@ -744,3 +772,10 @@ class ConstTranslations< //
         'Operator `*` is not supported for class `ConstTranslations`.');
   }
 }
+
+typedef MissingTranslationCallback = bool Function({
+  required Object? key,
+  required StringLocale locale,
+  required Translations translations,
+  required Iterable<String> supportedLocales,
+});

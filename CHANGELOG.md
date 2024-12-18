@@ -2,6 +2,33 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
+## 5.0.0
+
+* You can now define `Translations.supportedLocales` to specify the locales that your
+  app supports. If you do this, only those supported locales will be considered when
+  recording missing translations. In other words, unsupported locales will not be
+  recorded as missing translations. Note the supported locales should be valid BCP47
+  codes. For example:
+
+  ```dart
+  Translations.supportedLocales = ['en-US', 'cs-CZ', 'es', 'zh-Hant-CN'];
+  ```
+
+* **Breaking Change**: The `Translations.missingTranslationCallback` signature changed,
+  and it's now of type `MissingTranslationCallback`:
+
+  ```dart
+  typedef MissingTranslationCallback = bool Function({
+    required Object? key,
+    required StringLocale locale,
+    required Translations translations,
+    required Iterable<String> supportedLocales,
+    });
+  ```
+
+  Note it now also returns a boolean. Only if it returns `true`, the missing translation
+  will be put into the `Translations.missingTranslations` map.
+
 ## 4.0.0
 
 * `Translations.byHttp()` is now available (only when using the `i18n_extension` package).

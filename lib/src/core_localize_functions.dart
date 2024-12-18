@@ -57,9 +57,12 @@ String localize(
   Map<String, String>? translatedStringPerLocale = translations[key];
 
   if (translatedStringPerLocale == null) {
-    if (Translations.recordMissingKeys)
-      Translations.missingKeys
-          .add(TranslatedString(locale: translations.defaultLocaleStr, key: key));
+    //
+    if (Translations.recordMissingKeys) {
+      Translations.missingKeys.add(
+        TranslatedString(locale: translations.defaultLocaleStr, key: key),
+      );
+    }
 
     Translations.missingKeyCallback(key, translations.defaultLocaleStr);
 
@@ -73,8 +76,7 @@ String localize(
       throw TranslationsException(
           "Locale is the 4 letter string 'null', which is invalid.");
 
-    // Get the translated string in the language we want.
-    // Return the translated string in the language we want.
+    // Find and return the translated string in the exact locale.
     String? translatedString = translatedStringPerLocale[locale];
     if (translatedString != null) return translatedString;
 
@@ -89,12 +91,8 @@ String localize(
       return true;
     }());
 
-    // If there's no translated string in the locale, record it.
-    if (Translations.recordMissingTranslations &&
-        (locale != translations.defaultLocaleStr)) {
-      Translations.missingTranslations.add(TranslatedString(locale: locale, key: key));
-      Translations.missingTranslationCallback(key, locale);
-    }
+    // It the exact locale was not found, and it's a supported locale, record missing.
+    _recordMissingTranslations(key, locale, translations);
 
     // ---
 
@@ -106,6 +104,9 @@ String localize(
       String partialLocale = parts.sublist(0, i).join('-');
       String? translatedString = translatedStringPerLocale[partialLocale];
       if (translatedString != null) return translatedString;
+
+      // It the partial locale was not found, and it's a supported locale, record missing.
+      _recordMissingTranslations(key, partialLocale, translations);
 
       // If the deprecated format (underscore lowercase) matches, throw an error.
       assert(() {
@@ -146,6 +147,25 @@ String localize(
     // If nothing is found, return the value or key,
     // that is the translation in the default locale.
     return translatedStringPerLocale[translations.defaultLocaleStr] ?? key.toString();
+  }
+}
+
+void _recordMissingTranslations(
+  Object? key,
+  String locale,
+  Translations translations,
+) {
+  if (Translations.recordMissingTranslations) {
+    //
+    bool shouldRecord = Translations.missingTranslationCallback(
+      key: key,
+      locale: locale,
+      translations: translations,
+      supportedLocales: Translations.supportedLocales,
+    );
+
+    if (shouldRecord)
+      Translations.missingTranslations.add(TranslatedString(locale: locale, key: key));
   }
 }
 

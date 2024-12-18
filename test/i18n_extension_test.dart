@@ -146,7 +146,8 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "MyString": {
-        "en-US": "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
+        "en-US":
+            "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
         "pt-BR":
             "\uFFFFMinhaString\uFFFF0\uFFFEZero\uFFFF1\uFFFEUm\uFFFF2\uFFFEDois\uFFFFM\uFFFEMuitos",
       },
@@ -185,7 +186,8 @@ void main() {
 
     expect(t.translationByLocale_ByTranslationKey, {
       "MyString": {
-        "en-US": "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
+        "en-US":
+            "\uFFFFMyString\uFFFF0\uFFFEZero\uFFFF1\uFFFEOne\uFFFF2\uFFFETwo\uFFFFM\uFFFEmany",
         "pt-BR":
             "\uFFFFMinhaString\uFFFF0\uFFFEZero\uFFFF1\uFFFEUm\uFFFF2\uFFFEDois\uFFFFM\uFFFEMuitos",
       },
@@ -340,7 +342,8 @@ void main() {
         '-----------------------------\n');
   });
 
-  test("Combine 2 translations, one of them by locale. Define both as `Translations`", () {
+  test("Combine 2 translations, one of them by locale. Define both as `Translations`",
+      () {
     DefaultLocale.set("en-US");
 
     Translations t1 = Translations.byText("en-US") +
@@ -591,6 +594,7 @@ void main() {
 
     // 1) Search for a key which exists, and the translation also exists.
 
+    Translations.supportedLocales = ["en-US", "cs-CZ", "en-UK", "pt-BR", "es"];
     Translations.missingKeys.clear();
     Translations.missingTranslations.clear();
     expect(Translations.missingKeys, isEmpty);
@@ -609,18 +613,25 @@ void main() {
 
     // 2) Search for a key which does NOT exist.
 
+    Translations.supportedLocales = ["en-US", "cs-CZ", "en-UK", "pt-BR", "es"];
+    Translations.missingKeys.clear();
+    Translations.missingTranslations.clear();
+
     DefaultLocale.set("en-US");
     expect("Unknown text".i18n, "Unknown text");
 
-    expect(Translations.missingKeys.length, 1);
-    expect(Translations.missingKeys.single.locale, "en-US");
-    expect(Translations.missingKeys.single.key, "Unknown text");
+    expect(Translations.missingKeys.single,
+        TranslatedString(locale: "en-US", key: "Unknown text"));
+
     expect(Translations.missingTranslations, isEmpty);
 
     // ---------------
 
-    // 3) Search for a key which exists, but the translation in the locale does NOT.
+    // 3) Search for a key which exists, but the translation in the locale does NOT,
+    //    and "xx-YY" is a supported locale.
 
+    //
+    Translations.supportedLocales = ["xx-YY", "en-US", "cs-CZ", "en-UK", "pt-BR", "es"];
     Translations.missingKeys.clear();
     Translations.missingTranslations.clear();
 
@@ -628,11 +639,28 @@ void main() {
     expect("Hi.".i18n, "Hi.");
 
     expect(Translations.missingKeys, isEmpty);
-    expect(Translations.missingTranslations.single.locale, "xx-YY");
-    expect(Translations.missingTranslations.single.key, "Hi.");
+
+    expect(Translations.missingTranslations.single,
+        TranslatedString(locale: "xx-YY", key: "Hi."));
+
+    // ---------------
+
+    // 4) Search for a key which exists, but the translation in the locale does NOT,
+    //    and "xx-YY" is NOT a supported locale.
+
+    Translations.supportedLocales = ["en-US", "cs-CZ", "en-UK", "pt-BR", "es"];
+    Translations.missingKeys.clear();
+    Translations.missingTranslations.clear();
+
+    DefaultLocale.set("xx_YY");
+    expect("Hi.".i18n, "Hi.");
+
+    expect(Translations.missingKeys, isEmpty);
+    expect(Translations.missingTranslations, isEmpty);
   });
 
-  test("Don't record unnecessary missing translations with the Translation.byLocale constructor.",
+  test(
+      "Don't record unnecessary missing translations with the Translation.byLocale constructor.",
       () {
     //
     // ---------------
@@ -935,8 +963,11 @@ void main() {
 
     t = Translations.byText("en-US") +
         {
-          "en-US":
-              "1 beer".zeroOne("0 or 1 beers").two("2 beers").three("3 beers").many("many beers"),
+          "en-US": "1 beer"
+              .zeroOne("0 or 1 beers")
+              .two("2 beers")
+              .three("3 beers")
+              .many("many beers"),
         };
 
     expect(localizePlural(0, key, t, locale: "en-US"), "0 or 1 beers");
@@ -1009,7 +1040,8 @@ void main() {
     var key = "1 beer";
 
     // Make sure "1 or more" DOES NOT include zero (but includes 1).
-    var t = Translations.byText("en-US") + {"en-US": "1 beer".oneOrMore("1 or more beer")};
+    var t =
+        Translations.byText("en-US") + {"en-US": "1 beer".oneOrMore("1 or more beer")};
 
     expect(localizePlural(0, key, t, locale: "en-US"), "1 beer");
     expect(localizePlural(1, key, t, locale: "en-US"), "1 or more beer");
@@ -1032,8 +1064,8 @@ void main() {
     DefaultLocale.set("en-US");
     var key = "1 beer";
 
-    var t =
-        Translations.byText("en-US") + {"en-US": "1 beer".zero("").three("").many("many beers")};
+    var t = Translations.byText("en-US") +
+        {"en-US": "1 beer".zero("").three("").many("many beers")};
 
     expect(localizePlural(0, key, t, locale: "en-US"), "");
     expect(localizePlural(1, key, t, locale: "en-US"), "1 beer");
