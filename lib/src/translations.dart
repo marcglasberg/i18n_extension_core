@@ -592,13 +592,13 @@ abstract class Translations< //
     required Translations translations,
     required Iterable<String> supportedLocales,
   }) {
-    if (locale == translations.defaultLocaleStr) return false;
-
-    if (supportedLocales.isEmpty || (supportedLocales.contains(locale))) {
+    if (locale != translations.defaultLocaleStr &&
+        (supportedLocales.isEmpty || supportedLocales.contains(locale))) {
       print('➜ There are no translations in "$locale" for "$key".');
       return true;
-    } else
+    } else {
       return false;
+    }
   }
 
   /// Generative constructor.
