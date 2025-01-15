@@ -4,7 +4,7 @@ import 'package:i18n_extension_core/i18n_extension_core.dart';
 /// (compatible with the Unicode Locale Identifier (ULI) syntax).
 ///
 /// It should consist of a language subtag (mandatory), and optional script, region,
-/// variant, extension, and private use subtags.
+/// variant, extension, and private use subtags. The separators must be hyphens.
 ///
 bool isValidLocale(String locale) {
   // Split the locale by hyphen
@@ -96,7 +96,9 @@ bool _isTitleCaseScript(String str) =>
 /// This function throws a [TranslationsException] if the locale is not a valid BCP47
 /// language tag (compatible with the Unicode Locale Identifier (ULI) syntax).
 ///
-/// If it's valid, it returns the locale, unchanged.
+/// If it's valid, it returns the original locale, UNCHANGED. Note this function
+/// does NOT normalize the locale, it just checks if it's valid. To normalize the
+/// locale, use [DefaultLocale.normalizeLocale].
 ///
 /// The most common language identifiers are generally two ('en') or five ('en-US)'
 /// letters. They follow a standard format, which can vary in length depending on the
@@ -116,19 +118,19 @@ bool _isTitleCaseScript(String str) =>
 ///
 /// `language[-script][-region][-variant][-extension]`
 ///
-/// * Script Code: A four-letter code defined by ISO 15924 that represents a writing system.
-/// For example, sr-Cyrl specifies Serbian language written in Cyrillic script, while sr-Latn
-/// specifies Serbian in Latin script.
+/// * Script Code: A four-letter code defined by ISO 15924 that represents a writing
+/// system. For example, sr-Cyrl specifies Serbian language written in Cyrillic script,
+/// while sr-Latn specifies Serbian in Latin script.
 ///
-/// * Variant: Additional variations of a locale where there is a need to distinguish between
-/// orthographies or conventions beyond language, script, and region.
+/// * Variant: Additional variations of a locale where there is a need to distinguish
+/// between orthographies or conventions beyond language, script, and region.
 ///
-/// * Extensions: For specifying additional behaviors (such as currency, calendar type, number
-/// system) that might be preferred in the user interface.
+/// * Extensions: For specifying additional behaviors (such as currency, calendar type,
+/// number system) that might be preferred in the user interface.
 ///
-/// An example of a more complex locale identifier could be `zh-Hant-HK` (Chinese, Traditional
-/// script, as used in Hong Kong SAR) or de-DE-1996 (German as used in Germany, orthography
-/// of 1996).
+/// An example of a more complex locale identifier could be `zh-Hant-HK` (Chinese,
+/// Traditional script, as used in Hong Kong SAR) or de-DE-1996 (German as used in
+/// Germany, orthography of 1996).
 ///
 /// So, locales can vary in length and complexity beyond just two or five letters,
 /// reflecting the diversity of language, script, region, and cultural preferences.
@@ -137,17 +139,21 @@ String checkLocale(String locale) {
   //
   if (locale.length > 64) throw TranslationsException('Locale is too large.');
 
+  // If the locale is not valid, throw an exception.
   if (!isValidLocale(locale)) {
+    //
+    // We normalize just to show a better error message.
+    // We should NOT return the normalized locale.
     String normalized = DefaultLocale.normalizeLocale(locale) ?? '';
+
     if (isValidLocale(normalized))
-      throw TranslationsException(
-          'Locale "$locale" is not a valid BCP47 language tag. '
+      throw TranslationsException('Locale "$locale" is not a valid BCP47 language tag. '
           'Try "$normalized".');
     else
-      throw TranslationsException(
-          'Locale "$locale" is not a valid BCP47 language tag.');
+      throw TranslationsException('Locale "$locale" is not a valid BCP47 language tag.');
   }
 
+  // Return the original locale, unchanged.
   return locale;
 }
 

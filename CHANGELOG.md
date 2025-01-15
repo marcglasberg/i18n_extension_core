@@ -2,7 +2,7 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
-## 5.0.0
+## 5.0.1
 
 * You can now define `Translations.supportedLocales` to specify the locales that your
   app supports. If you do this, only those supported locales will be considered when
