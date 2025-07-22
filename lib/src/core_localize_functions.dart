@@ -91,7 +91,7 @@ String localize(
       return true;
     }());
 
-    // It the exact locale was not found, and it's a supported locale, record missing.
+    // If the exact locale was not found, and it's a supported locale, record missing.
     _recordMissingTranslations(key, locale, translations);
 
     // ---
@@ -105,7 +105,7 @@ String localize(
       String? translatedString = translatedStringPerLocale[partialLocale];
       if (translatedString != null) return translatedString;
 
-      // It the partial locale was not found, and it's a supported locale, record missing.
+      // If the partial locale was not found, and it's a supported locale, record missing.
       _recordMissingTranslations(key, partialLocale, translations);
 
       // If the deprecated format (underscore lowercase) matches, throw an error.

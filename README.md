@@ -11,15 +11,15 @@ the [i18n_extension](https://pub.dev/packages/i18n_extension) package._
 
 * Do NOT include this core package directly.
 
-  Instead, go to the [i18n_extension](https://pub.dev/packages/i18n_extension) package which
-  already exports this core code, plus provides Flutter related code like the `I18n` widget
-  that you must use to wrap your widget tree.
+  Instead, go to the [i18n_extension](https://pub.dev/packages/i18n_extension) package
+  which already exports this core code, plus provides Flutter related code like the `I18n`
+  widget that you must use to wrap your widget tree.
 
 ## In your Dart server or Dart-only code:
 
-* If you are creating code for a Dart server (backend) like [Celest](https://celest.dev/), or
-  developing some Dart-only package that does not depend on Flutter, then you can use this package
-  directly:
+* If you are working on a Dart server-side application (backend) using frameworks such as
+  Serverpod, Dart Frog, or Shelf, or developing a Dart-only package that does not rely on
+  Flutter, you can use this package directly.:
 
   ```
   import 'package:i18n_extension_core/i18n_extension_core.dart';
@@ -33,11 +33,12 @@ the [i18n_extension](https://pub.dev/packages/i18n_extension) package._
   expect("Hello".i18n, "Hola");
   ```                                                              
 
-  > Note: When using [Celest](https://celest.dev/), this is especially useful for translating the
-  exception messages that the backend throws to the frontend. For example,
-  throwing `MyException('The password you typed is invalid'.i18n);` in the backend, will
-  reach the frontend already translated
-  as `MyException('La contraseña que ingresaste no es válida')` if the user device is in Spanish.
+  > Note: One key use case is translating exception messages from the backend to the
+  frontend. For example, if the backend throws an exception like:
+  `MyException('The password you typed is invalid'.i18n)`
+  it will automatically appear on the frontend as:
+  `MyException('La contraseña que ingresaste no es válida')`
+  if the user's device language is set to Spanish.
 
 ## Documentation
 
@@ -47,8 +48,8 @@ There are only 2 differences when using this package directly:
 
 * Here you don't have access to the `I18n` widget, which is a Flutter widget.
 
-* The way to set the default locale is different. Instead of using the `I18n` widget, you must use
-  the `DefaultLocale.set()` static method, like in the example above.
+* The way to set the default locale is different. Instead of using the `I18n` widget, you
+  must use the `DefaultLocale.set()` static method, like in the example above.
 
 ********
 

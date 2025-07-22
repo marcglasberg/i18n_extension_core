@@ -588,7 +588,7 @@ abstract class Translations< //
 
   static bool _defaultMissingTranslationCallback({
     required Object? key,
-    required StringLocale locale,
+    required String locale,
     required Translations translations,
     required Iterable<String> supportedLocales,
   }) {
@@ -775,7 +775,7 @@ class ConstTranslations< //
 
 typedef MissingTranslationCallback = bool Function({
   required Object? key,
-  required StringLocale locale,
+  required String locale,
   required Translations translations,
   required Iterable<String> supportedLocales,
 });
