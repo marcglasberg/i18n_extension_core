@@ -54,6 +54,16 @@ class TranslationsByLocale< //
   /// Note the resources must be the language tag followed by '.json' or '.po'.
   final Iterable<String>? resources;
 
+  /// Controls whether the load process should fail when an individual file or
+  /// resource cannot be loaded, for [Translations.byFile] and [Translations.byHttp].
+  /// When false, the offending file or resource is logged and skipped, and the ones
+  /// that loaded correctly are kept. Default is true, for backward compatibility.
+  ///
+  /// Note this flag is only a configuration carried by this object. It is read and
+  /// applied by the loader in the `i18n_extension` package, since this package does
+  /// not load files or resources itself.
+  final bool failOnMissingResource;
+
   /// The completer to be used when loading translations from a file or from the web,
   /// when using [Translations.byFile] or [Translations.byHttp].
   final Completer? completer;
@@ -96,14 +106,18 @@ class TranslationsByLocale< //
         dir = null,
         url = null,
         resources = null,
+        failOnMissingResource = true,
         completer = null,
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),
           translationByLocale_ByTranslationKey: <TKEY, TRANbyLOCALE>{}, // dummy.
         );
 
-  TranslationsByLocale.byFile(String defaultLocaleStr, {required String this.dir})
-      : byKey = TranslationsByText(defaultLocaleStr),
+  TranslationsByLocale.byFile(
+    String defaultLocaleStr, {
+    required String this.dir,
+    this.failOnMissingResource = true,
+  })  : byKey = TranslationsByText(defaultLocaleStr),
         url = null,
         resources = null,
         completer = Completer(),
@@ -116,6 +130,7 @@ class TranslationsByLocale< //
     String defaultLocaleStr, {
     required String this.url,
     required Iterable<String> this.resources,
+    this.failOnMissingResource = true,
   })  : byKey = TranslationsByText(defaultLocaleStr),
         dir = null,
         completer = Completer(),

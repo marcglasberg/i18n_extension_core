@@ -355,6 +355,22 @@ abstract class Translations< //
   /// and `.po` files present in the `assets/translations` directory, and then rebuild
   /// your widgets with those new translations.
   ///
+  /// The optional [failOnMissingResource] parameter (default: true) controls what
+  /// happens when an individual file fails to load, for example because it cannot be
+  /// decoded. When true, the whole load fails. When false, the offending file is
+  /// logged and skipped, and the files that loaded correctly are kept:
+  ///
+  /// ```dart
+  /// static final _t = Translations.byFile('en-US',
+  ///   dir: 'assets/translations',
+  ///   failOnMissingResource: false, // Keep the files that loaded correctly.
+  /// );
+  /// ```
+  ///
+  /// Note this flag is only a configuration carried by the translations object. It is
+  /// read and applied by the loader in the `i18n_extension` package, since this
+  /// package does not load files itself.
+  ///
   /// Note: Since rebuilding widgets when the translations finish loading can cause a
   /// visible flicker, you can optionally avoid that by preloading the translations
   /// before running your app. To that end, first create a `load()` method in
@@ -422,14 +438,19 @@ abstract class Translations< //
   /// - [Translations.byHttp], where you load translations from the web.
   /// - [ConstTranslations.new], which responds better to hot reload.
   ///
-  static Translations byFile(StringLocale defaultLocaleStr, {required String dir}) {
+  static Translations byFile(
+    StringLocale defaultLocaleStr, {
+    required String dir,
+    bool failOnMissingResource = true,
+  }) {
     var translations = TranslationsByLocale<
             String,
             Map<StringLocale, StringTranslated>,
             Map<String, StringTranslated>,
             Map<StringLocale, Map<StringLocale, StringTranslated>>>.byFile(
         defaultLocaleStr,
-        dir: dir);
+        dir: dir,
+        failOnMissingResource: failOnMissingResource);
 
     // If the load-by-file process has been set, load it.
     // Otherwise, add it to the list of translations to load in the future.
@@ -467,6 +488,23 @@ abstract class Translations< //
   /// https://example.com/translations/fr.po
   ///
   /// Then, the widgets will rebuild with those new translations.
+  ///
+  /// The optional [failOnMissingResource] parameter (default: true) controls what
+  /// happens when an individual resource fails to load, for example with a 404 or a
+  /// network error. When true, the whole load fails. When false, the offending
+  /// resource is logged and skipped, and the resources that loaded correctly are kept:
+  ///
+  /// ```dart
+  /// static final _t = Translations.byHttp('en-US',
+  ///   url: 'https://example.com/translations',
+  ///   resources: ['en-US.json', 'es.json', 'pt-BR.po', 'fr.po'],
+  ///   failOnMissingResource: false, // Keep the resources that loaded correctly.
+  /// );
+  /// ```
+  ///
+  /// Note this flag is only a configuration carried by the translations object. It is
+  /// read and applied by the loader in the `i18n_extension` package, since this
+  /// package does not load resources itself.
   ///
   /// Note: Since rebuilding widgets when the translations finish loading can cause a
   /// visible flicker, you can optionally avoid that by preloading the translations
@@ -532,6 +570,7 @@ abstract class Translations< //
     StringLocale defaultLocaleStr, {
     required String url,
     required Iterable<String> resources,
+    bool failOnMissingResource = true,
   }) {
     var translations = TranslationsByLocale<
         String,
@@ -541,6 +580,7 @@ abstract class Translations< //
       defaultLocaleStr,
       url: url,
       resources: resources,
+      failOnMissingResource: failOnMissingResource,
     );
 
     // If the load-by-http process has been set, load it.

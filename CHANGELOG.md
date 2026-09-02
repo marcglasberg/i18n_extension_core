@@ -2,6 +2,28 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
+## 5.1.0
+
+* `Translations.byFile()` and `Translations.byHttp()` now accept an optional
+  `failOnMissingResource` parameter. It defaults to `true`, which keeps the previous
+  behavior: if a single file or resource fails to load, the whole load fails, and no
+  translations are loaded at all.
+
+  When you set it to `false`, the file or resource that failed is logged and skipped,
+  and the ones that loaded correctly are kept. This is useful when a language file is
+  temporarily unavailable, and you'd rather show the other languages than none:
+
+  ```dart
+  static final _t = Translations.byHttp('en-US',
+    url: 'https://example.com/translations',
+    resources: ['en-US.json', 'es.json', 'pt-BR.po', 'fr.po'],
+    failOnMissingResource: false, // Keep the resources that loaded correctly.
+  );
+  ```
+
+  Note this flag is only a configuration carried by the translations object. The
+  behavior it describes is implemented by the loader in the `i18n_extension` package.
+
 ## 5.0.2
 
 * You can now define `Translations.supportedLocales` to specify the locales that your
