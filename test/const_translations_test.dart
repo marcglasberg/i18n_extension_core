@@ -255,14 +255,14 @@ extension Localization on String {
             .many("Há %d itens."),
       } +
       {
-        "en-US": "There is a person"
-            .modifier(Gender.male, "There is a man")
-            .modifier(Gender.female, "There is a woman")
-            .modifier(Gender.they, "There is a person"),
-        "pt-BR": "Há uma pessoa"
-            .modifier(Gender.male, "Há um homem")
-            .modifier(Gender.female, "Há uma mulher")
-            .modifier(Gender.they, "Há uma pessoa"),
+        "en-US": "There is an animal"
+            .modifier(Animal.dog, "There is a dog")
+            .modifier(Animal.cat, "There is a cat")
+            .modifier(Animal.fish, "There is a fish"),
+        "pt-BR": "Há um animal"
+            .modifier(Animal.dog, "Há um cachorro")
+            .modifier(Animal.cat, "Há um gato")
+            .modifier(Animal.fish, "Há um peixe"),
       };
 
   String get i18n => localize(this, _t);
@@ -275,10 +275,10 @@ extension Localization on String {
 
   Map<String?, String> allVersions() => localizeAllVersions(this, _t);
 
-  String gender(Gender gnd) => localizeVersion(gnd, this, _t);
+  String animal(Animal animal) => localizeVersion(animal, this, _t);
 }
 
-enum Gender { they, female, male, x }
+enum Animal { dog, cat, fish, x }
 
 class SomeObj {
   final String value;

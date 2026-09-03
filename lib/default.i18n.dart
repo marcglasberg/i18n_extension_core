@@ -2,6 +2,7 @@
 // For more info, see: https://pub.dartlang.org/packages/i18n_extension
 
 import 'package:i18n_extension_core/src/core_localize_functions.dart';
+import 'package:i18n_extension_core/src/gender.dart';
 
 /// When you create a widget that has translatable strings,
 /// add this default import to the widget's file:
@@ -10,7 +11,7 @@ import 'package:i18n_extension_core/src/core_localize_functions.dart';
 /// import 'package:i18n_extension_core/default.i18n.dart';
 /// ```
 ///
-/// This will allow you to add `.i18n` and `.plural()` to your strings,
+/// This will allow you to add `.i18n`, `.plural()` and `.gender()` to your strings,
 /// but won't translate anything.
 ///
 extension Localization on String {
@@ -22,11 +23,15 @@ extension Localization on String {
   /// Translates a string where %d is replaced by the given number.
   /// It returns the same [value] provided, where %d is replaced by the given number.
   /// This marks the string for future translation, and records the given value as a key
-  /// missing translation with unknown locale.
-  String plural(value) {
+  /// missing translation with unknown locale. The [gender] is ignored.
+  String plural(value, [Gender? gender]) {
     recordMissingKey(this);
     return replaceAll("%d", value.toString());
   }
+
+  /// It returns the same string, unaffected, for any [gender]. This marks the string for
+  /// future translation, and records it as a missing translation with unknown locale.
+  String gender(Gender gender) => recordMissingKey(this);
 
   /// Does an `sprintf` on the [text] with the [params].
   /// This is implemented with the `sprintf` package: https://pub.dev/packages/sprintf

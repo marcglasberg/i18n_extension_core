@@ -766,6 +766,62 @@ void main() {
     expect(text.plural(5), "mno");
     expect(text.version("5"), "mno");
     expect(text.allVersions()["5"], "mno");
+
+    // Gender modifiers are encoded as "m", "f" and "n".
+    text = "MyKey".male("abc").female("def").neutral("ghi");
+    expect(text, "\uFFFFMyKey\uFFFFm\uFFFEabc\uFFFFf\uFFFEdef\uFFFFn\uFFFEghi");
+
+    expect(text.gender(Gender.male), "abc");
+    expect(text.version("m"), "abc");
+    expect(text.allVersions()["m"], "abc");
+
+    expect(text.gender(Gender.female), "def");
+    expect(text.version("f"), "def");
+    expect(text.allVersions()["f"], "def");
+
+    expect(text.gender(Gender.neutral), "ghi");
+    expect(text.version("n"), "ghi");
+    expect(text.allVersions()["n"], "ghi");
+
+    // Gender and plural modifiers can be mixed, and don't collide:
+    // "m" (male) is not "M" (many), and "f" (female) is not "F" (zeroOne).
+    text = "MyKey".many("abc").zeroOne("def").male("ghi").female("jkl");
+    expect(text.plural(3), "abc");
+    expect(text.plural(1), "def");
+    expect(text.gender(Gender.male), "ghi");
+    expect(text.gender(Gender.female), "jkl");
+    expect(text.gender(Gender.neutral), "MyKey");
+
+    // Nested modifiers are flattened, with the outer identifier prepended to the
+    // identifiers of the inner versions. This is how gender and plural are combined.
+    text = "MyKey".male("abc".zero("def").many("ghi"));
+    expect(text, "MyKey".male("abc").modifier("m0", "def").modifier("mM", "ghi"));
+    expect(text.allVersions(), {null: "MyKey", "m": "abc", "m0": "def", "mM": "ghi"});
+    expect(text.gender(Gender.male), "abc");
+    expect(text.plural(1, Gender.male), "abc");
+    expect(text.plural(0, Gender.male), "def");
+    expect(text.plural(3, Gender.male), "ghi");
+    expect(text.plural(3, Gender.female), "MyKey");
+    expect(text.plural(3), "MyKey");
+
+    // Custom modifiers are flattened the same way.
+    text = "MyKey".modifier("x", "abc".modifier("y", "def").modifier("z", "ghi"));
+    expect(text, "MyKey".modifier("x", "abc").modifier("xy", "def").modifier("xz", "ghi"));
+    expect(text.version("x"), "abc");
+    expect(text.version("xy"), "def");
+    expect(text.version("xz"), "ghi");
+
+    // `.times(10)` is the same as `.ten()`, so that `.plural(10)` finds it
+    // (it looks for the `T` version, not for a `10` version).
+    expect("MyKey".times(10, "abc"), "MyKey".ten("abc"));
+    expect("MyKey".times(10, "abc").plural(10), "abc");
+    expect("MyKey".times(10, "abc").version("T"), "abc");
+    expect("MyKey".times(12, "abc").plural(12), "abc");
+    expect("MyKey".times(12, "abc").version(12), "abc");
+
+    // The identifier of a custom modifier is its toString().
+    expect("MyKey".modifier(Animal.dog, "abc").version(Animal.dog), "abc");
+    expect("MyKey".modifier(Animal.dog, "abc").version("Animal.dog"), "abc");
   });
 
   test("Numeric modifiers.", () {
@@ -792,28 +848,206 @@ void main() {
   test("Custom modifiers.", () {
     //
     DefaultLocale.set("en-US");
-    var text = "There is a person";
-    expect(text.gender(Gender.male), "There is a man");
-    expect(text.gender(Gender.female), "There is a woman");
-    expect(text.gender(Gender.they), "There is a person");
+    var text = "There is an animal";
+    expect(text.animal(Animal.dog), "There is a dog");
+    expect(text.animal(Animal.cat), "There is a cat");
+    expect(text.animal(Animal.fish), "There is a fish");
 
     expect(
-        () => text.gender(Gender.x),
+        () => text.animal(Animal.x),
         throwsA(TranslationsException(
-            "This text has no version for modifier 'Gender.x' (modifier: Gender.x, key: 'There is a person', locale: 'en-US').")));
+            "This text has no version for modifier 'Animal.x' (modifier: Animal.x, key: 'There is an animal', locale: 'en-US').")));
 
     // ---
 
     DefaultLocale.set("pt-BR");
-    text = "There is a person";
-    expect(text.gender(Gender.male), "Há um homem");
-    expect(text.gender(Gender.female), "Há uma mulher");
-    expect(text.gender(Gender.they), "Há uma pessoa");
+    text = "There is an animal";
+    expect(text.animal(Animal.dog), "Há um cachorro");
+    expect(text.animal(Animal.cat), "Há um gato");
+    expect(text.animal(Animal.fish), "Há um peixe");
 
     expect(
-        () => text.gender(Gender.x),
+        () => text.animal(Animal.x),
         throwsA(TranslationsException(
-            "This text has no version for modifier 'Gender.x' (modifier: Gender.x, key: 'There is a person', locale: 'pt-BR').")));
+            "This text has no version for modifier 'Animal.x' (modifier: Animal.x, key: 'There is an animal', locale: 'pt-BR').")));
+  });
+
+  test("Gender modifiers.", () {
+    //
+    // A gender without a version (here, neutral) falls back to the unversioned text.
+    DefaultLocale.set("en-US");
+    var text = "There is a person";
+    expect(text.gender(Gender.male), "There is a man");
+    expect(text.gender(Gender.female), "There is a woman");
+    expect(text.gender(Gender.neutral), "There is a person");
+
+    DefaultLocale.set("pt-BR");
+    expect(text.gender(Gender.male), "Há um homem");
+    expect(text.gender(Gender.female), "Há uma mulher");
+    expect(text.gender(Gender.neutral), "Há uma pessoa");
+
+    // ---
+
+    // The neutral version, when defined, is used instead of the unversioned text.
+    DefaultLocale.set("en-US");
+    text = "Welcome";
+    expect(text.gender(Gender.male), "Welcome, sir");
+    expect(text.gender(Gender.female), "Welcome, madam");
+    expect(text.gender(Gender.neutral), "Welcome, friend");
+
+    DefaultLocale.set("pt-BR");
+    expect(text.gender(Gender.male), "Bem-vindo, senhor");
+    expect(text.gender(Gender.female), "Bem-vinda, senhora");
+    expect(text.gender(Gender.neutral), "Boas-vindas");
+
+    // ---
+
+    // Any gender without a version falls back to the unversioned text,
+    // which may be different for each locale.
+    DefaultLocale.set("en-US");
+    text = "Thank you";
+    expect(text.gender(Gender.male), "Thank you, sir");
+    expect(text.gender(Gender.female), "Thank you");
+    expect(text.gender(Gender.neutral), "Thank you");
+
+    DefaultLocale.set("pt-BR");
+    expect(text.gender(Gender.male), "Obrigado");
+    expect(text.gender(Gender.female), "Obrigada");
+    expect(text.gender(Gender.neutral), "Obrigado");
+
+    // ---
+
+    // A text without versions returns its translation, for any gender.
+    DefaultLocale.set("pt-BR");
+    expect("Hi.".gender(Gender.male), "Olá.");
+    expect("Hi.".gender(Gender.female), "Olá.");
+    expect("Hi.".gender(Gender.neutral), "Olá.");
+
+    // A text without translation returns the key itself, for any gender.
+    expect("Missing".gender(Gender.male), "Missing");
+    expect("Missing".gender(Gender.female), "Missing");
+    expect("Missing".gender(Gender.neutral), "Missing");
+
+    // ---
+
+    // The gender versions are also available with `version` and `allVersions`.
+    DefaultLocale.set("en-US");
+    expect("There is a person".version("m"), "There is a man");
+    expect("There is a person".version("f"), "There is a woman");
+    expect("There is a person".allVersions(), {
+      null: "There is a person",
+      "m": "There is a man",
+      "f": "There is a woman",
+    });
+
+    // The `locale` parameter of `localizeGender` overrides the default locale.
+    expect(localizeGender(Gender.female, "Thank you", Localization._t, locale: "pt-BR"),
+        "Obrigada");
+  });
+
+  test("Gender and plural combined.", () {
+    //
+    DefaultLocale.set("en-US");
+    var text = "There is a guest";
+
+    // The plural versions of the gender come first.
+    expect(text.plural(0, Gender.male), "There are no gentlemen");
+    expect(text.plural(0, Gender.female), "There are no ladies");
+    expect(text.plural(3, Gender.male), "There are 3 gentlemen");
+    expect(text.plural(3, Gender.female), "There are 3 ladies");
+
+    // For 1 element, the gender version is the singular of the gender.
+    expect(text.plural(1, Gender.male), "There is a gentleman");
+    expect(text.plural(1, Gender.female), "There is a lady");
+
+    // A gender without versions (here, neutral) uses the plural versions
+    // that don't depend on the gender, the same as no gender at all.
+    expect(text.plural(0, Gender.neutral), "There are no guests");
+    expect(text.plural(1, Gender.neutral), "There is a guest");
+    expect(text.plural(3, Gender.neutral), "There are 3 guests");
+    expect(text.plural(0), "There are no guests");
+    expect(text.plural(1), "There is a guest");
+    expect(text.plural(3), "There are 3 guests");
+
+    // The gender function alone returns the singular of the gender.
+    expect(text.gender(Gender.male), "There is a gentleman");
+    expect(text.gender(Gender.female), "There is a lady");
+    expect(text.gender(Gender.neutral), "There is a guest");
+
+    expect(text.allVersions(), {
+      null: "There is a guest",
+      "0": "There are no guests",
+      "M": "There are %d guests",
+      "m": "There is a gentleman",
+      "m0": "There are no gentlemen",
+      "mM": "There are %d gentlemen",
+      "f": "There is a lady",
+      "f0": "There are no ladies",
+      "fM": "There are %d ladies",
+    });
+
+    DefaultLocale.set("pt-BR");
+    expect(text.plural(0, Gender.male), "Não há cavalheiros");
+    expect(text.plural(1, Gender.male), "Há um cavalheiro");
+    expect(text.plural(3, Gender.male), "Há 3 cavalheiros");
+    expect(text.plural(0, Gender.female), "Não há damas");
+    expect(text.plural(1, Gender.female), "Há uma dama");
+    expect(text.plural(3, Gender.female), "Há 3 damas");
+    expect(text.plural(0, Gender.neutral), "Não há convidados");
+    expect(text.plural(1, Gender.neutral), "Há um convidado");
+    expect(text.plural(3, Gender.neutral), "Há 3 convidados");
+
+    // ---
+
+    // Fallbacks, when not all the combinations are declared.
+    DefaultLocale.set("en-US");
+
+    var t = Translations.byText("en-US") +
+        {
+          "en-US": "There is a person"
+              .male("There is a man")
+              .zero("There is nobody")
+              .many("There are %d people"),
+        } +
+        {
+          "en-US": "One person" //
+              .one("There is one person")
+              .male("There is a man"),
+        } +
+        {
+          "en-US": "Woman" //
+              .female("There is a woman".zeroOne("There is at most one woman")),
+        };
+
+    String plural(Object? n, String key, [Gender? gender]) =>
+        localizePlural(n, key, t, gender: gender);
+
+    // The gender version is the singular of the gender...
+    expect(plural(1, "There is a person", Gender.male), "There is a man");
+
+    // ...so for other numbers, the plural versions without gender are used.
+    expect(plural(0, "There is a person", Gender.male), "There is nobody");
+    expect(plural(3, "There is a person", Gender.male), "There are 3 people");
+
+    // A gender without versions falls back to the plural versions without gender,
+    // and then to the unversioned text.
+    expect(plural(1, "There is a person", Gender.female), "There is a person");
+    expect(plural(3, "There is a person", Gender.female), "There are 3 people");
+
+    // For 1 element, the gender version wins over the `.one()` version.
+    expect(plural(1, "One person", Gender.male), "There is a man");
+    expect(plural(1, "One person", Gender.female), "There is one person");
+    expect(plural(1, "One person"), "There is one person");
+
+    // The plural versions of the gender follow the plural rules, like `zeroOne`.
+    expect(plural(0, "Woman", Gender.female), "There is at most one woman");
+    expect(plural(1, "Woman", Gender.female), "There is at most one woman");
+    expect(plural(2, "Woman", Gender.female), "Woman");
+
+    // The `locale` parameter overrides the default locale.
+    expect(localizePlural(2, "There is a guest", Localization._t, //
+            locale: "pt-BR", gender: Gender.female),
+        "Há 2 damas");
   });
 
   test("Czech variations.", () {
@@ -1228,30 +1462,74 @@ extension Localization on String {
             .many("Há %d itens."),
       } +
       {
-        "en-US": "There is a person"
-            .modifier(Gender.male, "There is a man")
-            .modifier(Gender.female, "There is a woman")
-            .modifier(Gender.they, "There is a person"),
-        "pt-BR": "Há uma pessoa"
-            .modifier(Gender.male, "Há um homem")
-            .modifier(Gender.female, "Há uma mulher")
-            .modifier(Gender.they, "Há uma pessoa"),
+        "en-US": "There is an animal"
+            .modifier(Animal.dog, "There is a dog")
+            .modifier(Animal.cat, "There is a cat")
+            .modifier(Animal.fish, "There is a fish"),
+        "pt-BR": "Há um animal"
+            .modifier(Animal.dog, "Há um cachorro")
+            .modifier(Animal.cat, "Há um gato")
+            .modifier(Animal.fish, "Há um peixe"),
+      } +
+      {
+        "en-US": "There is a person" //
+            .male("There is a man")
+            .female("There is a woman"),
+        "pt-BR": "Há uma pessoa" //
+            .male("Há um homem")
+            .female("Há uma mulher"),
+      } +
+      {
+        "en-US": "Welcome" //
+            .male("Welcome, sir")
+            .female("Welcome, madam")
+            .neutral("Welcome, friend"),
+        "pt-BR": "Bem-vindo" //
+            .male("Bem-vindo, senhor")
+            .female("Bem-vinda, senhora")
+            .neutral("Boas-vindas"),
+      } +
+      {
+        "en-US": "Thank you".male("Thank you, sir"),
+        "pt-BR": "Obrigado".female("Obrigada"),
+      } +
+      {
+        "en-US": "There is a guest"
+            .zero("There are no guests")
+            .many("There are %d guests")
+            .male("There is a gentleman"
+                .zero("There are no gentlemen")
+                .many("There are %d gentlemen"))
+            .female("There is a lady" //
+                .zero("There are no ladies")
+                .many("There are %d ladies")),
+        "pt-BR": "Há um convidado"
+            .zero("Não há convidados")
+            .many("Há %d convidados")
+            .male("Há um cavalheiro" //
+                .zero("Não há cavalheiros")
+                .many("Há %d cavalheiros"))
+            .female("Há uma dama" //
+                .zero("Não há damas")
+                .many("Há %d damas")),
       };
 
   String get i18n => localize(this, _t);
 
   String fill(List<Object> params) => localizeFill(this, params);
 
-  String? plural(value) => localizePlural(value, this, _t);
+  String? plural(value, [Gender? gender]) => localizePlural(value, this, _t, gender: gender);
 
   String version(Object modifier) => localizeVersion(modifier, this, _t);
 
   Map<String?, String> allVersions() => localizeAllVersions(this, _t);
 
-  String gender(Gender gnd) => localizeVersion(gnd, this, _t);
+  String gender(Gender gender) => localizeGender(gender, this, _t);
+
+  String animal(Animal animal) => localizeVersion(animal, this, _t);
 }
 
-enum Gender { they, female, male, x }
+enum Animal { dog, cat, fish, x }
 
 class SomeObj {
   final String value;

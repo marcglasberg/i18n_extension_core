@@ -1,6 +1,7 @@
 import 'package:i18n_extension_core/src/parse_string.dart';
 import 'package:sprintf/sprintf.dart';
 
+import 'gender.dart';
 import 'translated_string.dart';
 import 'translations.dart';
 import 'translations_exception.dart';
@@ -398,6 +399,28 @@ String localizeFill(Object? text, Object p1,
 /// rules will apply.
 ///
 /// ---
+///
+/// If a [gender] is provided, the plural versions of that gender are tried first. Those
+/// are declared by nesting the plural modifiers inside the gender modifier, like this:
+///
+/// ```
+/// "There is a person"
+///     .zero("There is nobody")
+///     .many("There are %d people")
+///     .male("There is a man".zero("There are no men").many("There are %d men"))
+///     .female("There is a woman".zero("There are no women").many("There are %d women"))
+/// ```
+///
+/// For 1 element, the gender version itself (like `.male("There is a man")`) is the
+/// singular of that gender. When the gender has no applicable version, the plural
+/// versions that don't depend on the gender are tried, and finally the unversioned
+/// text. In the example above:
+///
+/// - `localizePlural(3, key, t, gender: Gender.female)` returns `There are 3 women`.
+/// - `localizePlural(1, key, t, gender: Gender.male)` returns `There is a man`.
+/// - `localizePlural(0, key, t, gender: Gender.neutral)` returns `There is nobody`.
+///
+/// ---
 /// This function is visible only from the [i18_exception_core] package.
 /// The [i18_exception] package uses a different function with the same name.
 ///
@@ -406,6 +429,7 @@ String localizePlural(
   Object? key,
   Translations translations, {
   String? locale,
+  Gender? gender,
 }) {
   int modifierInt = convertToIntegerModifier(modifier);
 
@@ -413,68 +437,33 @@ String localizePlural(
 
   Map<String?, String> versions = localizeAllVersions(key, translations, locale: locale);
 
+  /// The plural modifiers that apply to the number of elements, from the most
+  /// specific to the least specific.
+  List<String> modifiers = _pluralModifiers(modifierInt);
+
   String? text;
 
-  /// For plural(0), returns the version 0, otherwise the version the version
-  /// 0-1, otherwise the version many, otherwise the unversioned.
-  if (modifierInt == 0)
-    text = versions["0"] ?? versions["F"] ?? versions["M"] ?? versions[null];
+  if (gender != null) {
+    String genderId = _genderModifier(gender);
 
-  /// For plural(1), returns the version 1, otherwise the version the version
-  /// 0-1, otherwise the version the version 1-many, otherwise the unversioned.
-  else if (modifierInt == 1)
-    text = versions["1"] ?? versions["F"] ?? versions["R"] ?? versions[null];
+    /// First, the plural versions of the gender, like `.male("...".zero("..."))`,
+    /// which are encoded with the gender modifier prepended, like `m0`.
+    for (String modifier in modifiers) {
+      text ??= versions["$genderId$modifier"];
+    }
 
-  /// For plural(2), returns the version 2, otherwise the version 2-3-4,
-  /// otherwise the version many/1-many, otherwise the unversioned.
-  else if (modifierInt == 2)
-    text = versions["2"] ??
-        versions["C"] ??
-        versions["M"] ??
-        versions["R"] ??
-        versions[null];
+    /// Then, for 1 element, the gender version, like `.male("There is a man")`,
+    /// which is the singular of the gender.
+    if (modifierInt == 1) text ??= versions[genderId];
+  }
 
-  /// For plural(3), returns the version 3, otherwise the version 2-3-4,
-  /// otherwise the version many/1-many, otherwise the unversioned.
-  else if (modifierInt == 3)
-    text = versions["3"] ??
-        versions["C"] ??
-        versions["M"] ??
-        versions["R"] ??
-        versions[null];
+  /// Then, the plural versions that don't depend on the gender.
+  for (String modifier in modifiers) {
+    text ??= versions[modifier];
+  }
 
-  /// For plural(4), returns the version 4, otherwise the version 2-3-4,
-  /// otherwise the version many/1-many, otherwise the unversioned.
-  else if (modifierInt == 4)
-    text = versions["4"] ??
-        versions["C"] ??
-        versions["M"] ??
-        versions["R"] ??
-        versions[null];
-
-  /// For plural(5), returns the version 5, otherwise the version many/1-many,
-  /// otherwise the unversioned.
-  else if (modifierInt == 5)
-    text = versions["5"] ?? versions["M"] ?? versions["R"] ?? versions[null];
-
-  /// For plural(6), returns the version 6, otherwise the version many/1-many,
-  /// otherwise the unversioned.
-  else if (modifierInt == 6)
-    text = versions["6"] ?? versions["M"] ?? versions["R"] ?? versions[null];
-
-  /// For plural(10), returns the version 10, otherwise the version many/1-many,
-  /// For plural(10), returns the version 10, otherwise the version many/1-many,
-  /// otherwise the unversioned.
-  else if (modifierInt == 10)
-    text = versions["T"] ?? versions["M"] ?? versions["R"] ?? versions[null];
-
-  /// For plural(<0 or >2), returns the version many/1-many,
-  /// otherwise the unversioned.
-  else
-    text = versions[modifierInt.toString()] ??
-        versions["M"] ??
-        versions["R"] ??
-        versions[null];
+  /// Otherwise, the unversioned.
+  text ??= versions[null];
 
   // ---
 
@@ -489,6 +478,36 @@ String localizePlural(
 
   return text;
 }
+
+/// The plural modifiers that apply to the given number of elements, from the most
+/// specific to the least specific. Note `F` is `zeroOne`, `R` is `oneOrMore`,
+/// `C` is `twoThreeFour`, `M` is `many` and `T` is `ten`.
+List<String> _pluralModifiers(int modifierInt) => switch (modifierInt) {
+      /// For plural(0), the version 0, otherwise the version 0-1, otherwise many.
+      0 => ["0", "F", "M"],
+
+      /// For plural(1), the version 1, otherwise the version 0-1, otherwise 1-many.
+      1 => ["1", "F", "R"],
+
+      /// For plural(2), (3) and (4), the exact version, otherwise the version 2-3-4,
+      /// otherwise many, otherwise 1-many.
+      2 => ["2", "C", "M", "R"],
+      3 => ["3", "C", "M", "R"],
+      4 => ["4", "C", "M", "R"],
+
+      /// For plural(10), the version ten, otherwise many, otherwise 1-many.
+      10 => ["T", "M", "R"],
+
+      /// For any other number, the exact version, otherwise many, otherwise 1-many.
+      _ => [modifierInt.toString(), "M", "R"],
+    };
+
+/// The modifiers of `.male()`, `.female()` and `.neutral()`.
+String _genderModifier(Gender gender) => switch (gender) {
+      Gender.male => "m",
+      Gender.female => "f",
+      Gender.neutral => "n",
+    };
 
 /// See rules stated in [localizePlural]'s documentation.
 /// IMPORTANT: This function is visible for testing purposes only.
@@ -524,6 +543,47 @@ int convertToIntegerModifier(Object? modifierObj) {
     throw AssertionError(modifierObj);
 }
 
+/// The [localizeGender] function returns the translated version for the given [gender],
+/// which is the version created with the `.male()`, `.female()` or `.neutral()` string
+/// modifiers.
+///
+/// If the text has no version for the given [gender], it returns the unversioned text.
+/// For example, `"Uma pessoa".male("Um homem").female("Uma mulher")` returns
+/// `"Uma pessoa"` for [Gender.neutral]. This also means a text without versions is
+/// returned as is, for any gender.
+///
+/// If [locale] is not provided (it's `null`), the method will use the default locale
+/// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].
+///
+/// If both [locale] and [DefaultLocale.locale] are not provided, it defaults to 'en-US'.
+///
+/// ---
+/// This function is visible only from the [i18_exception_core] package.
+/// The [i18_exception] package uses a different function with the same name.
+///
+String localizeGender(
+  Gender gender,
+  Object? key,
+  Translations translations, {
+  String? locale,
+}) {
+  locale = _normalizedOrDefaultLocale(locale);
+
+  Map<String?, String> versions = localizeAllVersions(key, translations, locale: locale);
+
+  /// Returns the version for the gender, otherwise the unversioned.
+  String? text = versions[_genderModifier(gender)] ?? versions[null];
+
+  if (text == null)
+    throw TranslationsException("No version found "
+        "(gender: $gender, "
+        "key: '$key', "
+        "locale: '$locale'"
+        ").");
+
+  return text;
+}
+
 /// Use the [localizeVersion] method to localize a "translatable string" to the given [locale].
 /// You must provide the [key] (which is usually the string you want to translate),
 /// a [modifier], and the [translations] object which holds the translations.
@@ -531,6 +591,11 @@ int convertToIntegerModifier(Object? modifierObj) {
 /// You may use an object of any type as the [modifier], but it will do a `toString()`
 /// in it and use resulting String. So, make sure your object has a suitable
 /// string representation.
+///
+/// Note the plural and gender modifiers are encoded as `0`, `1`, `2`, ..., `M` and
+/// `m`, `f`, `n` (the same keys returned by [localizeAllVersions]), so
+/// `localizeVersion("m", ...)` returns the male version. But to select those, use
+/// [localizePlural] and [localizeGender], which also apply the fallback rules.
 ///
 /// If [locale] is not provided (it's `null`), the method will use the default locale
 /// in [DefaultLocale.locale] (which may be set with [DefaultLocale.set].

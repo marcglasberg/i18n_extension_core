@@ -1,4 +1,6 @@
-/// String extension which allows you to add plural modifiers to a string.
+import 'gender.dart';
+
+/// String extension which allows you to add plural and gender modifiers to a string.
 ///
 /// For example:
 ///
@@ -17,9 +19,30 @@
 ///     .two("Você clicou um par de vezes")
 ///     .many("Você clicou %d vezes")
 ///     .times(12, "Você clicou uma dúzia de vezes"),
+/// } +
+/// {
+/// "en-US": "There is a person"
+///     .male("There is a man")
+///     .female("There is a woman"),
+/// "pt-BR": "Há uma pessoa"
+///     .male("Há um homem")
+///     .female("Há uma mulher"),
 /// };
 ///
-/// String plural(value) => localizePlural(value, this, _t);
+/// String plural(value, [Gender? gender]) => localizePlural(value, this, _t, gender: gender);
+///
+/// String gender(Gender gender) => localizeGender(gender, this, _t);
+/// ```
+///
+/// To combine gender and plural, nest the plural modifiers inside the gender modifiers,
+/// and pass the gender to `localizePlural`:
+///
+/// ```
+/// "en-US": "There is a person"
+///     .zero("There is nobody")
+///     .many("There are %d people")
+///     .male("There is a man".zero("There are no men").many("There are %d men"))
+///     .female("There is a woman".zero("There are no women").many("There are %d women")),
 /// ```
 ///
 /// This extension is visible from both [i18_exception] and [i18_exception_core] packages.
@@ -29,11 +52,31 @@ extension I18nModifierLocalization on String {
   static const _splitter1 = "\uFFFF";
   static const _splitter2 = "\uFFFE";
 
-  /// Creates a modifier for the given [identifier] and [text].
-  String modifier(Object identifier, String text) =>
-      ((!startsWith(_splitter1)) ? _splitter1 : "") //
-      +
-      "$this$_splitter1$identifier$_splitter2$text";
+  /// Creates a modifier for the given [identifier] and [text]. The identifier is
+  /// the `toString()` of the [identifier] object.
+  ///
+  /// The [text] may itself have modifiers, like in
+  /// `"There is a person".male("There is a man".zero("There are no men"))`.
+  /// In that case, the versions of [text] become versions of this string, with the
+  /// [identifier] prepended to their identifiers. In the example, the male version
+  /// (`m`) is `There is a man`, and the version `m0` is `There are no men`.
+  /// This is how the gender and plural modifiers are combined, see `localizePlural`.
+  String modifier(Object identifier, String text) {
+    String start = startsWith(_splitter1) ? "" : _splitter1;
+
+    if (!text.startsWith(_splitter1)) //
+      return "$start$this$_splitter1$identifier$_splitter2$text";
+
+    // The text has versions: its unversioned text becomes the version for the
+    // identifier, and its versions, like `0→There are no men`, get the identifier
+    // prepended, like `m0→There are no men`.
+    List<String> parts = text.split(_splitter1);
+    var buffer = StringBuffer("$start$this$_splitter1$identifier$_splitter2${parts[1]}");
+    for (int i = 2; i < parts.length; i++) {
+      buffer.write("$_splitter1$identifier${parts[i]}");
+    }
+    return buffer.toString();
+  }
 
   /// Plural modifier for zero elements.
   String zero(String text) => modifier("0", text);
@@ -60,9 +103,10 @@ extension I18nModifierLocalization on String {
   String ten(String text) => modifier("T", text);
 
   /// Plural modifier for any number of elements, except 0, 1 and 2.
+  /// Note: `.times(10, text)` is the same as `.ten(text)`.
   String times(int numberOfTimes, String text) {
     assert(numberOfTimes < 0 || numberOfTimes > 2);
-    return modifier(numberOfTimes, text);
+    return modifier((numberOfTimes == 10) ? "T" : numberOfTimes, text);
   }
 
   /// Plural modifier for 2, 3 or 4 elements (especially for Czech language).
@@ -79,4 +123,15 @@ extension I18nModifierLocalization on String {
   /// Note: [many] includes 0 elements, but it's less specific
   /// than [zero] and [zeroOne].
   String many(String text) => modifier("M", text);
+
+  /// Gender modifier for the male gender (see [Gender.male]).
+  String male(String text) => modifier("m", text);
+
+  /// Gender modifier for the female gender (see [Gender.female]).
+  String female(String text) => modifier("f", text);
+
+  /// Gender modifier for the neutral gender (see [Gender.neutral]).
+  /// Note: A gender without a version falls back to the unversioned text, so
+  /// this modifier is only needed when the neutral text is not the unversioned text.
+  String neutral(String text) => modifier("n", text);
 }

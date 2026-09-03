@@ -1,7 +1,7 @@
 import 'package:i18n_extension_core/i18n_extension_core.dart';
 import 'package:test/test.dart';
 
-enum MyTranslations { hi, goodbye, letsGo, person }
+enum MyTranslations { hi, goodbye, letsGo, animal, person }
 
 void main() {
   //
@@ -271,14 +271,24 @@ void main() {
     expect(456.plural(5), "Sim, você alcançou 5 items.");
 
     DefaultLocale.set("en-US");
+    expect(MyTranslations.animal.animal(Animal.dog), "There is a dog");
+    expect(MyTranslations.animal.animal(Animal.cat), "There is a cat");
+    expect(MyTranslations.animal.animal(Animal.fish), "There is a fish");
+
+    DefaultLocale.set("pt-BR");
+    expect(MyTranslations.animal.animal(Animal.dog), "Há um cachorro");
+    expect(MyTranslations.animal.animal(Animal.cat), "Há um gato");
+    expect(MyTranslations.animal.animal(Animal.fish), "Há um peixe");
+
+    DefaultLocale.set("en-US");
     expect(MyTranslations.person.gender(Gender.male), "There is a man");
     expect(MyTranslations.person.gender(Gender.female), "There is a woman");
-    expect(MyTranslations.person.gender(Gender.they), "There is a person");
+    expect(MyTranslations.person.gender(Gender.neutral), "There is a person");
 
     DefaultLocale.set("pt-BR");
     expect(MyTranslations.person.gender(Gender.male), "Há um homem");
     expect(MyTranslations.person.gender(Gender.female), "Há uma mulher");
-    expect(MyTranslations.person.gender(Gender.they), "Há uma pessoa");
+    expect(MyTranslations.person.gender(Gender.neutral), "Há uma pessoa");
   });
 
   test("Translate using the extension.", () {
@@ -368,15 +378,23 @@ extension Localization on Object? {
             .times(5, "Sim, você alcançou 5 items.")
             .many("Há %d itens."),
       },
+      MyTranslations.animal: {
+        "en-US": "There is an animal"
+            .modifier(Animal.dog, "There is a dog")
+            .modifier(Animal.cat, "There is a cat")
+            .modifier(Animal.fish, "There is a fish"),
+        "pt-BR": "Há um animal"
+            .modifier(Animal.dog, "Há um cachorro")
+            .modifier(Animal.cat, "Há um gato")
+            .modifier(Animal.fish, "Há um peixe"),
+      },
       MyTranslations.person: {
-        "en-US": "There is a person"
-            .modifier(Gender.male, "There is a man")
-            .modifier(Gender.female, "There is a woman")
-            .modifier(Gender.they, "There is a person"),
-        "pt-BR": "Há uma pessoa"
-            .modifier(Gender.male, "Há um homem")
-            .modifier(Gender.female, "Há uma mulher")
-            .modifier(Gender.they, "Há uma pessoa"),
+        "en-US": "There is a person" //
+            .male("There is a man")
+            .female("There is a woman"),
+        "pt-BR": "Há uma pessoa" //
+            .male("Há um homem")
+            .female("Há uma mulher"),
       },
       null: {
         "en-US": "This is empty",
@@ -395,10 +413,12 @@ extension Localization on Object? {
 
   Map<String?, String> allVersions() => localizeAllVersions(this, _t);
 
-  String gender(Gender gnd) => localizeVersion(gnd, this, _t);
+  String gender(Gender gender) => localizeGender(gender, this, _t);
+
+  String animal(Animal animal) => localizeVersion(animal, this, _t);
 }
 
-enum Gender { they, female, male, x }
+enum Animal { dog, cat, fish, x }
 
 class SomeObj {
   final String value;
