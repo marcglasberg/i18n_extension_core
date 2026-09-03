@@ -355,21 +355,30 @@ abstract class Translations< //
   /// and `.po` files present in the `assets/translations` directory, and then rebuild
   /// your widgets with those new translations.
   ///
-  /// The optional [failOnMissingResource] parameter (default: true) controls what
-  /// happens when an individual file fails to load, for example because it cannot be
-  /// decoded. When true, the whole load fails. When false, the offending file is
-  /// logged and skipped, and the files that loaded correctly are kept:
+  /// The optional [failOnMissingResource] and [failOnInvalidResource] parameters
+  /// (both default: true) control what happens when an individual file fails to load:
+  ///
+  /// - [failOnMissingResource] applies when the file cannot be read, for example an
+  ///   asset that fails to load (which on the web is also a download).
+  /// - [failOnInvalidResource] applies when the file was read, but cannot be decoded
+  ///   (invalid JSON, YAML, ARB, or ICU message) or has invalid content (for example,
+  ///   a value that is not a String).
+  ///
+  /// When a flag is true, that kind of failure fails the whole load. When false, the
+  /// offending file is reported and skipped, and the files that loaded correctly are
+  /// kept:
   ///
   /// ```dart
   /// static final _t = Translations.byFile('en-US',
   ///   dir: 'assets/translations',
-  ///   failOnMissingResource: false, // Keep the files that loaded correctly.
+  ///   failOnMissingResource: false, // Skip files that cannot be read.
+  ///   failOnInvalidResource: false, // Skip files that cannot be decoded.
   /// );
   /// ```
   ///
-  /// Note this flag is only a configuration carried by the translations object. It is
-  /// read and applied by the loader in the `i18n_extension` package, since this
-  /// package does not load files itself.
+  /// Note these flags are only a configuration carried by the translations object.
+  /// They are read and applied by the loader in the `i18n_extension` package, since
+  /// this package does not load files itself.
   ///
   /// Note: Since rebuilding widgets when the translations finish loading can cause a
   /// visible flicker, you can optionally avoid that by preloading the translations
@@ -442,6 +451,7 @@ abstract class Translations< //
     StringLocale defaultLocaleStr, {
     required String dir,
     bool failOnMissingResource = true,
+    bool failOnInvalidResource = true,
   }) {
     var translations = TranslationsByLocale<
             String,
@@ -450,7 +460,8 @@ abstract class Translations< //
             Map<StringLocale, Map<StringLocale, StringTranslated>>>.byFile(
         defaultLocaleStr,
         dir: dir,
-        failOnMissingResource: failOnMissingResource);
+        failOnMissingResource: failOnMissingResource,
+        failOnInvalidResource: failOnInvalidResource);
 
     // If the load-by-file process has been set, load it.
     // Otherwise, add it to the list of translations to load in the future.
@@ -489,22 +500,32 @@ abstract class Translations< //
   ///
   /// Then, the widgets will rebuild with those new translations.
   ///
-  /// The optional [failOnMissingResource] parameter (default: true) controls what
-  /// happens when an individual resource fails to load, for example with a 404 or a
-  /// network error. When true, the whole load fails. When false, the offending
-  /// resource is logged and skipped, and the resources that loaded correctly are kept:
+  /// The optional [failOnMissingResource] and [failOnInvalidResource] parameters
+  /// (both default: true) control what happens when an individual resource fails to
+  /// load:
+  ///
+  /// - [failOnMissingResource] applies when the resource cannot be read, for example
+  ///   with a 404 or a network error.
+  /// - [failOnInvalidResource] applies when the resource was read, but cannot be
+  ///   decoded (invalid JSON, YAML, ARB, or ICU message) or has invalid content (for
+  ///   example, a value that is not a String).
+  ///
+  /// When a flag is true, that kind of failure fails the whole load. When false, the
+  /// offending resource is reported and skipped, and the resources that loaded
+  /// correctly are kept:
   ///
   /// ```dart
   /// static final _t = Translations.byHttp('en-US',
   ///   url: 'https://example.com/translations',
   ///   resources: ['en-US.json', 'es.json', 'pt-BR.po', 'fr.po'],
-  ///   failOnMissingResource: false, // Keep the resources that loaded correctly.
+  ///   failOnMissingResource: false, // Skip resources that cannot be read.
+  ///   failOnInvalidResource: false, // Skip resources that cannot be decoded.
   /// );
   /// ```
   ///
-  /// Note this flag is only a configuration carried by the translations object. It is
-  /// read and applied by the loader in the `i18n_extension` package, since this
-  /// package does not load resources itself.
+  /// Note these flags are only a configuration carried by the translations object.
+  /// They are read and applied by the loader in the `i18n_extension` package, since
+  /// this package does not load resources itself.
   ///
   /// Note: Since rebuilding widgets when the translations finish loading can cause a
   /// visible flicker, you can optionally avoid that by preloading the translations
@@ -571,6 +592,7 @@ abstract class Translations< //
     required String url,
     required Iterable<String> resources,
     bool failOnMissingResource = true,
+    bool failOnInvalidResource = true,
   }) {
     var translations = TranslationsByLocale<
         String,
@@ -581,6 +603,7 @@ abstract class Translations< //
       url: url,
       resources: resources,
       failOnMissingResource: failOnMissingResource,
+      failOnInvalidResource: failOnInvalidResource,
     );
 
     // If the load-by-http process has been set, load it.

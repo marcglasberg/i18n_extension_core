@@ -55,14 +55,33 @@ class TranslationsByLocale< //
   final Iterable<String>? resources;
 
   /// Controls whether the load process should fail when an individual file or
-  /// resource cannot be loaded, for [Translations.byFile] and [Translations.byHttp].
-  /// When false, the offending file or resource is logged and skipped, and the ones
-  /// that loaded correctly are kept. Default is true, for backward compatibility.
+  /// resource cannot be read, for [Translations.byFile] and [Translations.byHttp].
+  /// This covers a 404 or network error, or an asset that fails to load (which on
+  /// the web is also a download). When false, the offending file or resource is
+  /// reported and skipped, and the ones that loaded correctly are kept.
+  /// Default is true, for backward compatibility.
+  ///
+  /// See [failOnInvalidResource] for files or resources that were read, but could
+  /// not be decoded or have invalid content.
   ///
   /// Note this flag is only a configuration carried by this object. It is read and
   /// applied by the loader in the `i18n_extension` package, since this package does
   /// not load files or resources itself.
   final bool failOnMissingResource;
+
+  /// Controls whether the load process should fail when an individual file or
+  /// resource was read, but could not be decoded (invalid JSON, YAML, ARB, or ICU
+  /// message) or has invalid content (for example, a value that is not a String),
+  /// for [Translations.byFile] and [Translations.byHttp]. When false, the offending
+  /// file or resource is reported and skipped, and the ones that loaded correctly
+  /// are kept. Default is true, for backward compatibility.
+  ///
+  /// See [failOnMissingResource] for files or resources that could not be read at all.
+  ///
+  /// Note this flag is only a configuration carried by this object. It is read and
+  /// applied by the loader in the `i18n_extension` package, since this package does
+  /// not load files or resources itself.
+  final bool failOnInvalidResource;
 
   /// The completer to be used when loading translations from a file or from the web,
   /// when using [Translations.byFile] or [Translations.byHttp].
@@ -107,6 +126,7 @@ class TranslationsByLocale< //
         url = null,
         resources = null,
         failOnMissingResource = true,
+        failOnInvalidResource = true,
         completer = null,
         super.gen(
           defaultLocaleStr: checkLocale(defaultLocaleStr),
@@ -117,6 +137,7 @@ class TranslationsByLocale< //
     String defaultLocaleStr, {
     required String this.dir,
     this.failOnMissingResource = true,
+    this.failOnInvalidResource = true,
   })  : byKey = TranslationsByText(defaultLocaleStr),
         url = null,
         resources = null,
@@ -131,6 +152,7 @@ class TranslationsByLocale< //
     required String this.url,
     required Iterable<String> this.resources,
     this.failOnMissingResource = true,
+    this.failOnInvalidResource = true,
   })  : byKey = TranslationsByText(defaultLocaleStr),
         dir = null,
         completer = Completer(),

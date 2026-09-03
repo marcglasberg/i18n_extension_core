@@ -2,6 +2,44 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
+## 5.2.0
+
+* `Translations.byFile()` and `Translations.byHttp()` now accept an optional
+  `failOnInvalidResource` parameter, next to `failOnMissingResource`. Both default to
+  `true`.
+
+  The two flags cover different kinds of failure:
+
+  - `failOnMissingResource` applies when the file or resource could not be read: a
+    404 or network error, or an asset that fails to load (which on the web is also a
+    download).
+  - `failOnInvalidResource` applies when the file or resource was read, but could not
+    be decoded (invalid JSON, YAML, ARB, or ICU message) or has invalid content (for
+    example, a value that is not a String).
+
+  When a flag is `false`, that kind of failure is reported and skipped, and the other
+  files or resources still load. For example, to tolerate a temporarily unavailable
+  language file, but still fail on a malformed one:
+
+  ```dart
+  static final _t = Translations.byHttp('en-US',
+    url: 'https://example.com/translations',
+    resources: ['en-US.json', 'es.json', 'pt-BR.po', 'fr.po'],
+    failOnMissingResource: false, // Skip resources that cannot be read.
+    failOnInvalidResource: true, // Still fail on resources that cannot be decoded.
+  );
+  ```
+
+* Added two subclasses of `TranslationsException`, so that the loader can report which
+  kind of failure happened: `MissingResourceException`, for a file or resource that
+  could not be read, and `InvalidResourceException`, for one that was read but could
+  not be decoded or has invalid content. Both can still be caught as a
+  `TranslationsException`.
+
+  Note these flags and exceptions are only a configuration carried by the translations
+  object. The behavior they describe is implemented by the loader in the
+  `i18n_extension` package.
+
 ## 5.1.0
 
 * `Translations.byFile()` and `Translations.byHttp()` now accept an optional
