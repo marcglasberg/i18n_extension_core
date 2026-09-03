@@ -2,7 +2,7 @@ Sponsored by [MyText.ai](https://mytext.ai)
 
 [![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
 
-## 5.2.0
+## 5.2.1
 
 * `Translations.byFile()` and `Translations.byHttp()` now accept an optional
   `failOnInvalidResource` parameter, next to `failOnMissingResource`. Both default to
@@ -30,15 +30,8 @@ Sponsored by [MyText.ai](https://mytext.ai)
   );
   ```
 
-* Added two subclasses of `TranslationsException`, so that the loader can report which
-  kind of failure happened: `MissingResourceException`, for a file or resource that
-  could not be read, and `InvalidResourceException`, for one that was read but could
-  not be decoded or has invalid content. Both can still be caught as a
-  `TranslationsException`.
-
-  Note these flags and exceptions are only a configuration carried by the translations
-  object. The behavior they describe is implemented by the loader in the
-  `i18n_extension` package.
+  Note these flags are only a configuration carried by the translations object. 
+  The behavior they describe is implemented by the loader in the `i18n_extension` package.
 
 ## 5.1.0
 
