@@ -1,8 +1,8 @@
 Sponsored by [MyText.ai](https://mytext.ai)
 
-[![](./example/SponsoredByMyTextAi.png)](https://mytext.ai)
+[![](./example/SponsoredByMyTextAi.jpg)](https://mytext.ai)
 
-## 6.0.0
+## 6.0.1
 
 * Gender modifiers `.male()`, `.female()` and `.neutral()`, and the `localizeGender()`
   function, which selects the version for a `Gender` (`Gender.male`, `Gender.female` or
